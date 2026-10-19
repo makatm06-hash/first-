@@ -40,3 +40,7 @@ Adobe's monochrome symbol is sourced from Simple Icons 11.15.0: https://raw.gith
 ## Saucony campaign
 
 `public/campaigns/saucony-cover.png` is the original image supplied in `sauc.zip`, kept unchanged. It appears in the main showcase and the first portfolio project, titled Saucony under Photography. Both covers preserve its 16:9 composition and original colours. The remaining project cards still use sample artwork.
+
+## RIMOWA campaign
+
+`public/campaigns/rimowa-a-lifetime-of-lives.png` is the unchanged original cover supplied in `rimowa.zip`. Its title is “a lifetime of lives”. It replaces the second concept project and appears alongside Saucony in the main showcase. Previous/next buttons cycle the two featured campaigns without autoplay; both covers retain their full widescreen composition and original colours.

@@ -27,3 +27,27 @@ test('portfolio, media upload, and booking workflow',async({page})=>{
  await page.screenshot({path:`/tmp/mastudio-${test.info().project.name}.png`,fullPage:true});
  expect(errors).toEqual([]);
 });
+
+test('featured campaigns cycle and RIMOWA cover opens',async({page})=>{
+ await page.goto('/');
+ const slides=page.locator('.featured-slide');
+ await expect(slides.nth(0)).toBeVisible();
+ await expect(slides.nth(1)).toBeHidden();
+ await page.getByRole('button',{name:'Next featured campaign'}).click();
+ await expect(slides.nth(0)).toBeHidden();
+ await expect(slides.nth(1)).toBeVisible();
+ await expect(slides.nth(1).locator('.media-caption')).toHaveText('a lifetime of lives');
+ await expect(page.locator('#showcase-position')).toHaveText('02 / 02');
+ await expect.poll(()=>slides.nth(1).locator('img').evaluate(img=>img.complete&&img.naturalWidth===3838)).toBe(true);
+ await page.getByRole('button',{name:'Next featured campaign'}).click();
+ await expect(slides.nth(0)).toBeVisible();
+ await page.getByRole('button',{name:'Previous featured campaign'}).click();
+ await expect(slides.nth(1)).toBeVisible();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+ await page.getByRole('button',{name:'View a lifetime of lives',exact:true}).click();
+ await expect(page.getByRole('dialog').getByRole('heading',{name:'a lifetime of lives',exact:true})).toBeVisible();
+ await expect.poll(()=>page.locator('.detail-media img').evaluate(img=>img.complete&&img.naturalWidth===3838)).toBe(true);
+ await page.getByRole('button',{name:'Close project'}).click();
+ await page.locator('.hero-media').scrollIntoViewIfNeeded();
+ await page.locator('.hero-media').screenshot({path:`/tmp/mastudio-rimowa-${test.info().project.name}.png`});
+});

@@ -14,3 +14,13 @@
 .hero-media--campaign img{position:absolute;inset:0;display:block;filter:none;object-position:center}
 .project--campaign .project-image{height:auto;aspect-ratio:16/9}
 .project--campaign .project-image img{display:block;filter:none}
+
+.featured-slide{position:absolute;inset:0}
+.featured-slide[hidden]{display:none}
+.hero-media--campaign .media-caption{max-width:calc(100% - 240px);font-size:clamp(24px,3.2vw,50px);line-height:1.05;letter-spacing:-.04em}
+.showcase-controls{position:absolute;right:28px;bottom:28px;display:flex;align-items:center;gap:10px;color:var(--paper)}
+#showcase-position{font-size:11px;letter-spacing:1px;margin-right:8px;font-variant-numeric:tabular-nums}
+.showcase-controls button{display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:50%;background:var(--paper);color:var(--ink);transition:background .2s}
+.showcase-controls button:hover{background:#dce0d2}
+.showcase-controls svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:560px){.showcase-controls{right:14px;bottom:15px;gap:7px}.showcase-controls button{width:36px;height:36px}#showcase-position{font-size:8px;margin-right:2px}.hero-media--campaign .media-caption{max-width:calc(100% - 155px);left:16px;bottom:18px;font-size:24px}.hero-media--campaign .media-note{left:16px;top:15px;font-size:7px}}
