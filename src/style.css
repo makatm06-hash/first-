@@ -36,3 +36,7 @@
 .hero-bottom>p{max-width:560px;margin-right:25px;line-height:1.6}
 .booking-layout>div>p{max-width:370px}
 @media(max-width:560px){.hero-bottom{display:grid;grid-template-columns:1fr;gap:12px}.hero-bottom>p{margin-right:0;margin-bottom:0;font-size:13px}.hero-bottom .round-link{justify-self:end}.booking-layout>div>p{max-width:320px}}
+
+.detail-media--video{position:relative;height:auto;aspect-ratio:16/9}
+.detail-media iframe{position:absolute;inset:0;display:block;width:100%;height:100%;border:0}
+.youtube-link{display:block;width:fit-content;font-size:12px;text-decoration:underline;text-underline-offset:4px;margin:18px 0 24px}

@@ -4,7 +4,7 @@ test('portfolio, media upload, and booking workflow',async({page})=>{
  await page.goto('/');
  await expect(page.getByRole('heading',{name:'BIG IDEAS. BUILT TO SCALE.'})).toBeVisible();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
- await page.getByRole('button',{name:'Still images',exact:true}).click();
+ await page.getByRole('button',{name:'Video campaigns',exact:true}).click();
  await expect(page.locator('.project:visible')).toHaveCount(3);
  await page.getByRole('button',{name:'View Stone Island'}).click();
  await expect(page.getByRole('dialog')).toBeVisible();
@@ -59,7 +59,7 @@ test('featured campaigns cycle and RIMOWA cover opens',async({page})=>{
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
  await page.getByRole('button',{name:'View a lifetime of lives',exact:true}).click();
  await expect(page.getByRole('dialog').getByRole('heading',{name:'a lifetime of lives',exact:true})).toBeVisible();
- await expect.poll(()=>page.locator('.detail-media img').evaluate(img=>img.complete&&img.naturalWidth===3838)).toBe(true);
+ await expect(page.locator('.detail-media iframe')).toHaveAttribute('src','https://www.youtube-nocookie.com/embed/yZzb0bxzl5I?rel=0&playsinline=1');
  await page.getByRole('button',{name:'Close project'}).click();
  await page.locator('.hero-media').scrollIntoViewIfNeeded();
  await page.locator('.hero-media').screenshot({path:`/tmp/mastudio-rimowa-${test.info().project.name}.png`});
@@ -95,4 +95,29 @@ test('product collage stays static and portfolio covers align', async ({page, is
  await expect(page.getByRole('button',{name:'Next product photo'})).toHaveCount(0);
  await page.getByRole('button',{name:'Close project'}).click();
  await page.locator('.work').screenshot({path:`/tmp/mastudio-even-covers-${isMobile?'mobile':'desktop'}.png`});
+});
+
+
+test('each campaign opens its matching YouTube player and removes it on close', async ({page}) => {
+ // Validate local embed wiring without depending on the external player network.
+ await page.route('https://www.youtube-nocookie.com/**', route=>route.fulfill({contentType:'text/html',body:'<!doctype html><title>External player placeholder</title>'}));
+ await page.goto('/');
+ await expect(page.locator('iframe')).toHaveCount(0);
+ for(const [name,id] of [['Saucony','JLWG4RrAMek'],['a lifetime of lives','yZzb0bxzl5I'],['Stone Island','CIXPhkQkelI']]){
+  const card=page.getByRole('button',{name:`View ${name}`,exact:true});
+  await expect(card.locator('img')).toHaveCount(1);
+  await card.click();
+  const player=page.getByRole('dialog').locator('iframe');
+  await expect(player).toHaveAttribute('src',`https://www.youtube-nocookie.com/embed/${id}?rel=0&playsinline=1`);
+  await expect(player).toHaveAttribute('title',`${name} campaign film`);
+  await expect(player).toHaveAttribute('allowfullscreen','');
+  const bounds=await player.boundingBox();
+  expect(Math.abs(bounds.width/bounds.height-16/9)).toBeLessThan(.02);
+  await expect(page.getByRole('link',{name:'Watch on YouTube'})).toHaveAttribute('href',`https://www.youtube.com/watch?v=${id}`);
+  await page.getByRole('button',{name:'Close project'}).click();
+  await expect(page.locator('iframe')).toHaveCount(0);
+ }
+ await page.getByRole('button',{name:'View product photography',exact:true}).click();
+ await expect(page.locator('.detail-media img')).toHaveAttribute('src','/campaigns/product-photography/collage.png');
+ await expect(page.locator('iframe')).toHaveCount(0);
 });

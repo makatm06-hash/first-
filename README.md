@@ -57,4 +57,10 @@ The fourth project and featured cover use `public/campaigns/product-photography/
 
 A project can specify a `video` URL in `src/main.js`. Keep its `image` as the cover: campaign films appear only when the project viewer opens, with native controls, inline mobile playback, the existing cover as a poster, and metadata-only preloading. Playback does not start automatically and pauses when the viewer closes. URLs can reference locally bundled browser-compatible MP4/WebM assets or externally hosted files.
 
-The uploaded `videos.zip` could not be downloaded because it exceeds the workspace transfer tool’s 32 MiB limit. No campaign video files or video URLs have been added yet. Supply separate files under that limit or direct download URLs before configuring and validating the real films.
+The original `videos.zip` exceeded the workspace transfer tool’s 32 MiB limit. The user subsequently supplied YouTube URLs, now configured as privacy-enhanced embeds in the matching project viewers:
+
+- Saucony: https://youtu.be/JLWG4RrAMek
+- RIMOWA, “a lifetime of lives”: https://youtu.be/yZzb0bxzl5I
+- Stone Island: https://youtu.be/CIXPhkQkelI
+
+The existing cover images remain in the portfolio and showcase. YouTube players load only when a project opens, do not autoplay, support fullscreen and inline playback, and are removed on closing the viewer to stop playback. Each project also links to the original YouTube page. Product photography remains a static collage. Automated mapping tests mock the external frame response and do not establish remote video availability or playback permission.

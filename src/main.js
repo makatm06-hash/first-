@@ -5,9 +5,9 @@ import '@fontsource/noto-sans-symbols-2/400.css';
 import './style.css';
 
 const projects = [
- {name:'Saucony',category:'Still images',number:'01',image:'/campaigns/saucony-cover.png',alt:'Saucony campaign: three athletes in black and white with a lime-green Saucony logo',campaign:true,description:'Selected campaign imagery for Saucony.'},
- {name:'a lifetime of lives',client:'RIMOWA',category:'Video campaigns',number:'02',image:'/campaigns/rimowa-a-lifetime-of-lives.png',alt:'RIMOWA campaign: a woman sitting behind a silver suitcase in a warmly lit living room',campaign:true,description:'RIMOWA — a lifetime of lives.'},
- {name:'Stone Island',category:'Still images',number:'03',image:'/campaigns/stone-island-cover.png',alt:'Stone Island campaign: a model in a black jacket on a rugged landscape beneath a drone',campaign:true,description:'Selected campaign imagery for Stone Island.'},
+ {name:'Saucony',youtubeId:'JLWG4RrAMek',category:'Video campaigns',number:'01',image:'/campaigns/saucony-cover.png',alt:'Saucony campaign: three athletes in black and white with a lime-green Saucony logo',campaign:true,description:'Selected campaign imagery for Saucony.'},
+ {name:'a lifetime of lives',youtubeId:'yZzb0bxzl5I',client:'RIMOWA',category:'Video campaigns',number:'02',image:'/campaigns/rimowa-a-lifetime-of-lives.png',alt:'RIMOWA campaign: a woman sitting behind a silver suitcase in a warmly lit living room',campaign:true,description:'RIMOWA — a lifetime of lives.'},
+ {name:'Stone Island',youtubeId:'CIXPhkQkelI',category:'Video campaigns',number:'03',image:'/campaigns/stone-island-cover.png',alt:'Stone Island campaign: a model in a black jacket on a rugged landscape beneath a drone',campaign:true,description:'Selected campaign imagery for Stone Island.'},
  {name:'product photography',category:'Still images',number:'04',image:'/campaigns/product-photography/collage.png',alt:'Product photography collage: fragrance bottles, chess pieces, and warm golden light',campaign:true,description:'A product photography series exploring fragrance, light, and texture.'},
 ];
 const featuredProjects = projects.filter(project => project.campaign);
@@ -52,8 +52,18 @@ function renderMedia(i, container, controls = false) {
  const localUrl = urls.get(i);
  // Campaign films belong in the project viewer; grid covers stay as images.
  const videoSource = saved?.type.startsWith('video/') ? localUrl : controls && !saved ? project.video : null;
+ const youtubeId = controls && !saved ? project.youtubeId : null;
+ container.classList.toggle('detail-media--video', Boolean(controls && (youtubeId || videoSource)));
  container.replaceChildren();
- if (videoSource) {
+ if (youtubeId) {
+  const player = document.createElement('iframe');
+  player.src = `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&playsinline=1`;
+  player.title = `${project.name} campaign film`;
+  player.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+  player.allowFullscreen = true;
+  player.referrerPolicy = 'strict-origin-when-cross-origin';
+  container.append(player);
+ } else if (videoSource) {
   const video = document.createElement('video');
   video.src = videoSource;
   video.poster = project.image;
@@ -75,9 +85,9 @@ function renderMedia(i, container, controls = false) {
 function updateCard(i){const container=document.querySelector(`[data-project="${i}"] .project-image`);renderMedia(i,container);container.insertAdjacentHTML('beforeend',`<span class="project-open">↗</span><span class="project-index">/${projects[i].number}</span>`);}
 openDatabase().then(database=>{db=database;const req=db.transaction('projects').objectStore('projects').openCursor();req.onsuccess=()=>{const cursor=req.result;if(cursor){media.set(Number(cursor.key),cursor.value);urls.set(Number(cursor.key),URL.createObjectURL(cursor.value));updateCard(Number(cursor.key));cursor.continue();}};}).catch(()=>{document.querySelector('#editor-status').textContent='Browser storage is unavailable. Uploads will last for this visit only.';});
 const projectDialog=document.querySelector('#project-dialog');
-document.querySelectorAll('[data-project]').forEach(card=>card.addEventListener('click',()=>{const i=Number(card.dataset.project);const p=projects[i];const detail=document.querySelector('#project-detail');detail.innerHTML=`<div class="detail-media"></div><div class="detail-copy"><span class="eyebrow">${p.category} / ${p.number}</span><h2>${p.name}</h2><p>${p.description}</p><a class="text-button" href="#booking" id="project-enquiry">Start a project like this ↗</a></div>`;renderMedia(i,detail.querySelector('.detail-media'),true);detail.querySelector('#project-enquiry').onclick=()=>projectDialog.close();projectDialog.showModal();}));
+document.querySelectorAll('[data-project]').forEach(card=>card.addEventListener('click',()=>{const i=Number(card.dataset.project);const p=projects[i];const detail=document.querySelector('#project-detail');detail.innerHTML=`<div class="detail-media"></div><div class="detail-copy"><span class="eyebrow">${p.category} / ${p.number}</span><h2>${p.name}</h2><p>${p.description}</p>${p.youtubeId ? `<a class="youtube-link" href="https://www.youtube.com/watch?v=${p.youtubeId}" target="_blank" rel="noopener noreferrer">Watch on YouTube</a>` : ''}<a class="text-button" href="#booking" id="project-enquiry">Start a project like this ↗</a></div>`;renderMedia(i,detail.querySelector('.detail-media'),true);detail.querySelector('#project-enquiry').onclick=()=>projectDialog.close();projectDialog.showModal();}));
 document.querySelectorAll('.close-dialog').forEach(b=>b.onclick=()=>b.closest('dialog').close());
-document.querySelectorAll('dialog').forEach(d=>{d.addEventListener('click',e=>{if(e.target===d)d.close();});d.addEventListener('close',()=>d.querySelectorAll('video').forEach(v=>v.pause()));});
+document.querySelectorAll('dialog').forEach(d=>{d.addEventListener('click',e=>{if(e.target===d)d.close();});d.addEventListener('close',()=>{d.querySelectorAll('video').forEach(v=>v.pause());d.querySelectorAll('iframe').forEach(frame=>frame.remove());});});
 const editor=document.querySelector('#editor-dialog');
 ['edit-media','footer-edit'].forEach(id=>document.getElementById(id).onclick=()=>editor.showModal());
 document.querySelectorAll('[data-upload]').forEach(input=>input.onchange=async()=>{const file=input.files[0];if(!file)return;const status=document.querySelector('#editor-status');if(!/^(image|video)\//.test(file.type)){status.textContent='Please choose an image or video.';return;}if(file.size>100*1024*1024){status.textContent='Please choose a file smaller than 100 MB.';return;}const i=Number(input.dataset.upload);try{if(db)await storeMedia(i,file);if(urls.has(i))URL.revokeObjectURL(urls.get(i));media.set(i,file);urls.set(i,URL.createObjectURL(file));updateCard(i);status.textContent=db?'Media saved in this browser.':'Media updated for this visit.';}catch{status.textContent='Could not save this file. Browser storage may be full.';}});
