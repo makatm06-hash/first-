@@ -52,3 +52,9 @@ Adobe's monochrome symbol is sourced from Simple Icons 11.15.0: https://raw.gith
 ## Product photography
 
 The fourth project and featured cover use `public/campaigns/product-photography/collage.png`, the original collage supplied in `pdm 2.zip`, kept unchanged. It is a single static image with no hover slideshow or photo controls. All four portfolio covers share 16:9 frames, aligned rows, and even spacing, with a single-column layout on mobile. The collage can be opened uncropped in the project viewer.
+
+## Campaign films
+
+A project can specify a `video` URL in `src/main.js`. Keep its `image` as the cover: campaign films appear only when the project viewer opens, with native controls, inline mobile playback, the existing cover as a poster, and metadata-only preloading. Playback does not start automatically and pauses when the viewer closes. URLs can reference locally bundled browser-compatible MP4/WebM assets or externally hosted files.
+
+The uploaded `videos.zip` could not be downloaded because it exceeds the workspace transfer tool’s 32 MiB limit. No campaign video files or video URLs have been added yet. Supply separate files under that limit or direct download URLs before configuring and validating the real films.

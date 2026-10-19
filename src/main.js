@@ -46,7 +46,32 @@ const media = new Map();
 const urls = new Map();
 function openDatabase(){return new Promise((resolve,reject)=>{const request=indexedDB.open('mastudio-media',1);request.onupgradeneeded=()=>request.result.createObjectStore('projects');request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});}
 function storeMedia(key,value){return new Promise((resolve,reject)=>{const tx=db.transaction('projects','readwrite');const store=tx.objectStore('projects');value?store.put(value,key):store.clear();tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});}
-function renderMedia(i,container,controls=false){const saved=media.get(i);const url=urls.get(i)||projects[i].image;container.replaceChildren();if(saved?.type.startsWith('video/')){const video=document.createElement('video');video.src=url;video.controls=controls;video.muted=!controls;video.loop=!controls;video.playsInline=true;video.autoplay=!controls&&!reduced;video.preload='metadata';video.setAttribute('aria-label',projects[i].name);container.append(video);}else{const img=document.createElement('img');img.src=url;img.alt=projects[i].alt || projects[i].name;container.append(img);}}
+function renderMedia(i, container, controls = false) {
+ const project = projects[i];
+ const saved = media.get(i);
+ const localUrl = urls.get(i);
+ // Campaign films belong in the project viewer; grid covers stay as images.
+ const videoSource = saved?.type.startsWith('video/') ? localUrl : controls && !saved ? project.video : null;
+ container.replaceChildren();
+ if (videoSource) {
+  const video = document.createElement('video');
+  video.src = videoSource;
+  video.poster = project.image;
+  video.controls = controls;
+  video.muted = !controls;
+  video.loop = !controls;
+  video.playsInline = true;
+  video.autoplay = !controls && !reduced;
+  video.preload = 'metadata';
+  video.setAttribute('aria-label', `${project.name} campaign film`);
+  container.append(video);
+ } else {
+  const image = document.createElement('img');
+  image.src = localUrl || project.image;
+  image.alt = project.alt || project.name;
+  container.append(image);
+ }
+}
 function updateCard(i){const container=document.querySelector(`[data-project="${i}"] .project-image`);renderMedia(i,container);container.insertAdjacentHTML('beforeend',`<span class="project-open">↗</span><span class="project-index">/${projects[i].number}</span>`);}
 openDatabase().then(database=>{db=database;const req=db.transaction('projects').objectStore('projects').openCursor();req.onsuccess=()=>{const cursor=req.result;if(cursor){media.set(Number(cursor.key),cursor.value);urls.set(Number(cursor.key),URL.createObjectURL(cursor.value));updateCard(Number(cursor.key));cursor.continue();}};}).catch(()=>{document.querySelector('#editor-status').textContent='Browser storage is unavailable. Uploads will last for this visit only.';});
 const projectDialog=document.querySelector('#project-dialog');
