@@ -2,9 +2,9 @@ import { test, expect } from '@playwright/test';
 test('portfolio, media upload, and booking workflow',async({page})=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('/');
- await expect(page.getByRole('heading',{name:'GOOD IDEAS. GREAT IMPACT.'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'BIG IDEAS. BUILT TO SCALE.'})).toBeVisible();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
- await page.getByRole('button',{name:'Photography',exact:true}).click();
+ await page.getByRole('button',{name:'Still images',exact:true}).click();
  await expect(page.locator('.project:visible')).toHaveCount(3);
  await page.getByRole('button',{name:'View Stone Island'}).click();
  await expect(page.getByRole('dialog')).toBeVisible();
@@ -18,7 +18,7 @@ test('portfolio, media upload, and booking workflow',async({page})=>{
  await expect(page.locator('[data-project="0"] img')).toHaveAttribute('src',/^blob:/);
  await page.getByLabel('Your name').fill('Test Person');
  await page.getByLabel('Email address').fill('test@example.com');
- await page.getByLabel('What can I help with?').selectOption('Photography');
+ await page.getByLabel('What can we help with?').selectOption('Still-image campaign');
  await page.getByLabel('A little about your project').fill('A brand photography project.');
  const download=page.waitForEvent('download');
  await page.getByRole('button',{name:'Prepare booking request'}).click();

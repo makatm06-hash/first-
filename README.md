@@ -1,6 +1,6 @@
 # MASTUDIO
 
-A responsive creative portfolio built with Vite, vanilla JavaScript, and locally bundled Inter.
+The MASTUDIO AI creative production agency website, built with Vite, vanilla JavaScript, and locally bundled Inter. The agency creates video campaigns, commercials, and still-image campaigns for leading DTC and B2B brands through full AI production at scale.
 
 ## Development
 
