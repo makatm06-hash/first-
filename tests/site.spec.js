@@ -36,7 +36,7 @@ test('featured campaigns cycle and RIMOWA cover opens',async({page})=>{
  await page.getByRole('button',{name:'Next featured campaign'}).click();
  await expect(slides.nth(0)).toBeHidden();
  await expect(slides.nth(1)).toBeVisible();
- await expect(slides.nth(1).locator('.media-caption')).toHaveText('a lifetime of lives');
+ await expect(slides.nth(1)).toHaveAttribute('aria-label','2 of 2: a lifetime of lives');
  await expect(page.locator('#showcase-position')).toHaveText('02 / 02');
  await expect.poll(()=>slides.nth(1).locator('img').evaluate(img=>img.complete&&img.naturalWidth===3838)).toBe(true);
  await page.getByRole('button',{name:'Next featured campaign'}).click();
