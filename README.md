@@ -36,3 +36,7 @@ npx playwright test
 The client strip contains Ninja (kitchen appliances), Shark (home appliances), Sodii (Australian hydration), Budweiser, and Adobe. The four PNG logos were supplied by the user in `logos.zip` and are bundled unchanged under `public/logos/`. All logos are centered in matching responsive frames using `object-fit: contain` to preserve their original proportions. Adobe retains its existing symbol and text treatment.
 
 Adobe's monochrome symbol is sourced from Simple Icons 11.15.0: https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/adobe.svg. Simple Icons: https://github.com/simple-icons/simple-icons/tree/11.15.0 (CC0 collection; brand marks remain their owners' trademarks).
+
+## Saucony campaign
+
+`public/campaigns/saucony-cover.png` is the original image supplied in `sauc.zip`, kept unchanged. It appears in the main showcase and the first portfolio project, titled Saucony under Photography. Both covers preserve its 16:9 composition and original colours. The remaining project cards still use sample artwork.

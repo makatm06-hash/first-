@@ -5,7 +5,7 @@ test('portfolio, media upload, and booking workflow',async({page})=>{
  await expect(page.getByRole('heading',{name:'GOOD IDEAS. GREAT IMPACT.'})).toBeVisible();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
  await page.getByRole('button',{name:'Photography',exact:true}).click();
- await expect(page.locator('.project:visible')).toHaveCount(2);
+ await expect(page.locator('.project:visible')).toHaveCount(3);
  await page.getByRole('button',{name:'View Out of office'}).click();
  await expect(page.getByRole('dialog')).toBeVisible();
  await page.getByRole('button',{name:'Close project'}).click();

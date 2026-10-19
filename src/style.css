@@ -8,3 +8,9 @@
 .client-logo img{display:block;width:38px;height:38px;object-fit:contain}
 .clients .client-logo--artwork img{width:100%;height:100%;object-fit:contain}
 @media(max-width:560px){.clients .logo-group{gap:50px;padding-inline:25px}.clients .client-logo{flex-basis:140px;width:140px;height:48px;font-size:28px}.client-logo img{width:30px;height:30px}}
+
+/* Preserve the supplied campaign composition and original image colours. */
+.hero-media--campaign{height:auto;aspect-ratio:16/9}
+.hero-media--campaign img{position:absolute;inset:0;display:block;filter:none;object-position:center}
+.project--campaign .project-image{height:auto;aspect-ratio:16/9}
+.project--campaign .project-image img{display:block;filter:none}
