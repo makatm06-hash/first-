@@ -11,12 +11,12 @@ const projects = [
  {name:'Out of office',category:'Photography',number:'03',image:photo('photo-1464822759023-fed622ff2c3b'),description:'A change of perspective. Finding the extraordinary in the outside world.'},
  {name:'After hours',category:'Photography',number:'04',image:photo('photo-1519608487953-e999c86e7455'),description:'A collection of moments from the other side of the day.'},
 ];
-// Add official artwork paths here when the remaining brand assets are supplied.
+// User-supplied client artwork. Adobe retains its existing symbol and wordmark.
 const clientBrands = [
- { name: 'Ninja', slug: 'ninja', logo: null },
- { name: 'Shark', slug: 'shark', logo: null },
- { name: 'Sodii', slug: 'sodii', logo: null },
- { name: 'Budweiser', slug: 'budweiser', logo: null },
+ { name: 'Ninja', slug: 'ninja', logo: '/logos/ninja.png' },
+ { name: 'Shark', slug: 'shark', logo: '/logos/shark.png' },
+ { name: 'Sodii', slug: 'sodii', logo: '/logos/sodii.png' },
+ { name: 'Budweiser', slug: 'budweiser', logo: '/logos/budweiser.png' },
  { name: 'Adobe', slug: 'adobe', logo: '/logos/adobe.svg' },
 ];
 const clientLogos = clientBrands.map(brand => `

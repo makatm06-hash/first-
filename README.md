@@ -22,7 +22,7 @@ Create a production build with `npm run build`; serve it with `npm run preview`.
 
 ## Before publishing
 
-Replace sample projects, bundled concept artwork, temporary client wordmarks, and studio copy. Connect authenticated media management and hosting for permanent uploads. Connect a booking API/email provider, add server-side validation and abuse protection, and publish the relevant privacy information. No credentials should be included in client-side code.
+Replace sample projects, bundled concept artwork, and studio copy. Connect authenticated media management and hosting for permanent uploads. Connect a booking API/email provider, add server-side validation and abuse protection, and publish the relevant privacy information. No credentials should be included in client-side code.
 
 ## Browser checks
 
@@ -33,6 +33,6 @@ npx playwright test
 
 ## Client logo assets
 
-The client strip contains Ninja (kitchen appliances), Shark (home appliances), Sodii (Australian hydration), Budweiser, and Adobe. Ninja, Shark, Sodii, and Budweiser currently use plain text placeholders, not their official logos. Their official sites were blocked by the setup environment's network policy. Supply official SVG or transparent PNG files under `public/logos/`, then set each brand's `logo` path in `src/main.js` and hide its text span if the artwork includes the wordmark.
+The client strip contains Ninja (kitchen appliances), Shark (home appliances), Sodii (Australian hydration), Budweiser, and Adobe. The four PNG logos were supplied by the user in `logos.zip` and are bundled unchanged under `public/logos/`. All logos are centered in matching responsive frames using `object-fit: contain` to preserve their original proportions. Adobe retains its existing symbol and text treatment.
 
 Adobe's monochrome symbol is sourced from Simple Icons 11.15.0: https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/adobe.svg. Simple Icons: https://github.com/simple-icons/simple-icons/tree/11.15.0 (CC0 collection; brand marks remain their owners' trademarks).
