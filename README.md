@@ -44,3 +44,7 @@ Adobe's monochrome symbol is sourced from Simple Icons 11.15.0: https://raw.gith
 ## RIMOWA campaign
 
 `public/campaigns/rimowa-a-lifetime-of-lives.png` is the unchanged original cover supplied in `rimowa.zip`. Its title is “a lifetime of lives”. It replaces the second concept project and appears alongside Saucony in the main showcase. Previous/next buttons cycle the two featured campaigns without autoplay; both covers retain their full widescreen composition and original colours.
+
+## Stone Island campaign
+
+`public/campaigns/stone-island-cover.png` is the unchanged original image supplied in `stoney.zip`. It replaces the third concept project and joins Saucony and RIMOWA as the third main showcase slide. Showcase counts are derived from the featured projects. The carousel retains manual controls and no title overlays.
