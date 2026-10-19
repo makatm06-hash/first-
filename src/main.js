@@ -20,9 +20,9 @@ const clientBrands = [
  { name: 'Adobe', slug: 'adobe', logo: '/logos/adobe.svg' },
 ];
 const clientLogos = clientBrands.map(brand => `
- <span class="client-logo client-logo--${brand.slug}" role="img" aria-label="${brand.name}">
+ <span class="client-logo client-logo--${brand.slug}${brand.logo && brand.slug !== 'adobe' ? ' client-logo--artwork' : ''}" role="img" aria-label="${brand.name}">
   ${brand.logo ? `<img src="${brand.logo}" alt="" width="40" height="40">` : ''}
-  <span aria-hidden="true">${brand.name}</span>
+  ${!brand.logo || brand.slug === 'adobe' ? `<span aria-hidden="true">${brand.name}</span>` : ''}
  </span>`).join('');
 const arrow = '<span aria-hidden="true">↗</span>';
 document.querySelector('#app').innerHTML = `
