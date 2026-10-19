@@ -66,46 +66,33 @@ test('featured campaigns cycle and RIMOWA cover opens',async({page})=>{
 });
 
 
-test('product cover cycles in order on hover and resets when leaving', async ({page, isMobile}) => {
- test.skip(isMobile, 'Touch devices use the project viewer controls instead of hover.');
- await page.goto('/');
- const card = page.getByRole('button', {name:'View product photography', exact:true});
- const gallery = card.locator('.product-gallery');
- const active = gallery.locator('.is-active');
- await card.scrollIntoViewIfNeeded();
- await expect(active).toHaveAttribute('data-slide','1');
- await card.hover();
- await expect(active).toHaveAttribute('data-slide','2', {timeout:7000});
- await expect.poll(()=>active.evaluate(img=>img.complete&&img.naturalWidth===1792)).toBe(true);
- await expect(active).toHaveAttribute('data-slide','3', {timeout:5000});
- await page.mouse.move(0,0);
- await expect(active).toHaveAttribute('data-slide','1');
- await page.clock.install();
- await page.clock.runFor(3500);
- await expect(active).toHaveAttribute('data-slide','1');
- await card.hover();
- await page.clock.runFor(3100);
- await expect(active).toHaveAttribute('data-slide','2');
- await page.mouse.move(0,0);
- await expect(active).toHaveAttribute('data-slide','1');
-});
-
-test('product photos are available through manual viewer controls', async ({page}) => {
+test('product collage stays static and portfolio covers align', async ({page, isMobile}) => {
  await page.emulateMedia({reducedMotion:'reduce'});
  await page.goto('/');
- await page.getByRole('button',{name:'View product photography',exact:true}).click();
- const gallery=page.getByRole('dialog').locator('.product-gallery');
- const active=gallery.locator('.is-active');
- await expect(active).toHaveAttribute('data-slide','1');
- await page.getByRole('button',{name:'Next product photo'}).click();
- await expect(active).toHaveAttribute('data-slide','2');
- await page.getByRole('button',{name:'Next product photo'}).click();
- await expect(active).toHaveAttribute('data-slide','3');
- await page.getByRole('button',{name:'Next product photo'}).click();
- await expect(active).toHaveAttribute('data-slide','1');
- await page.getByRole('button',{name:'Previous product photo'}).click();
- await expect(active).toHaveAttribute('data-slide','3');
+ const card=page.getByRole('button',{name:'View product photography',exact:true});
+ const cover=card.locator('.project-image img');
+ await card.scrollIntoViewIfNeeded();
+ await expect(cover).toHaveAttribute('src','/campaigns/product-photography/collage.png');
+ await expect.poll(()=>cover.evaluate(img=>img.complete&&img.naturalWidth===5133)).toBe(true);
+ if(!isMobile) await card.hover();
+ await page.clock.install();
+ await page.clock.runFor(6500);
+ await expect(cover).toHaveAttribute('src','/campaigns/product-photography/collage.png');
+ const boxes=await page.locator('.project-image').evaluateAll(elements=>elements.map(el=>{const r=el.getBoundingClientRect();return {width:r.width,height:r.height,top:r.top,left:r.left};}));
+ for(const box of boxes){
+  expect(Math.abs(box.width/box.height-16/9)).toBeLessThan(.02);
+  expect(Math.abs(box.width-boxes[0].width)).toBeLessThan(1);
+  expect(Math.abs(box.height-boxes[0].height)).toBeLessThan(1);
+ }
+ if(isMobile){expect(boxes.every(box=>Math.abs(box.left-boxes[0].left)<1)).toBeTruthy();}
+ else{
+  expect(Math.abs(boxes[0].top-boxes[1].top)).toBeLessThan(1);
+  expect(Math.abs(boxes[2].top-boxes[3].top)).toBeLessThan(1);
+ }
+ await card.click();
+ await expect(page.getByRole('dialog').getByRole('heading',{name:'product photography',exact:true})).toBeVisible();
+ await expect(page.locator('.detail-media img')).toHaveAttribute('src','/campaigns/product-photography/collage.png');
+ await expect(page.getByRole('button',{name:'Next product photo'})).toHaveCount(0);
  await page.getByRole('button',{name:'Close project'}).click();
- await page.getByRole('button',{name:'View product photography',exact:true}).click();
- await expect(active).toHaveAttribute('data-slide','1');
+ await page.locator('.work').screenshot({path:`/tmp/mastudio-even-covers-${isMobile?'mobile':'desktop'}.png`});
 });

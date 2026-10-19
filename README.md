@@ -51,4 +51,4 @@ Adobe's monochrome symbol is sourced from Simple Icons 11.15.0: https://raw.gith
 
 ## Product photography
 
-The fourth project and showcase cover use the unchanged originals from `pdm.zip`, explicitly ordered as slide 1, slide 2, slide 3 under `public/campaigns/product-photography/`. Slide 1 is always the resting image. Mouse hover or keyboard focus starts a three-second loop; leaving resets to slide 1. Playback stops when the window loses focus, the page is hidden, or the featured campaign changes. Reduced-motion preferences disable automatic cycling. Opening the project provides manual photo controls for touch and keyboard use. Portrait originals retain their full composition.
+The fourth project and featured cover use `public/campaigns/product-photography/collage.png`, the original collage supplied in `pdm 2.zip`, kept unchanged. It is a single static image with no hover slideshow or photo controls. All four portfolio covers share 16:9 frames, aligned rows, and even spacing, with a single-column layout on mobile. The collage can be opened uncropped in the project viewer.
