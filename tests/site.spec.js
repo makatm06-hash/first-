@@ -36,17 +36,22 @@ test('featured campaigns cycle and RIMOWA cover opens',async({page})=>{
  await page.getByRole('button',{name:'Next featured campaign'}).click();
  await expect(slides.nth(0)).toBeHidden();
  await expect(slides.nth(1)).toBeVisible();
- await expect(slides.nth(1)).toHaveAttribute('aria-label','2 of 3: a lifetime of lives');
- await expect(page.locator('#showcase-position')).toHaveText('02 / 03');
+ await expect(slides.nth(1)).toHaveAttribute('aria-label','2 of 4: a lifetime of lives');
+ await expect(page.locator('#showcase-position')).toHaveText('02 / 04');
  await expect.poll(()=>slides.nth(1).locator('img').evaluate(img=>img.complete&&img.naturalWidth===3838)).toBe(true);
  await page.getByRole('button',{name:'Next featured campaign'}).click();
  await expect(slides.nth(2)).toBeVisible();
- await expect(slides.nth(2)).toHaveAttribute('aria-label','3 of 3: Stone Island');
- await expect(page.locator('#showcase-position')).toHaveText('03 / 03');
+ await expect(slides.nth(2)).toHaveAttribute('aria-label','3 of 4: Stone Island');
+ await expect(page.locator('#showcase-position')).toHaveText('03 / 04');
  await expect.poll(()=>slides.nth(2).locator('img').evaluate(img=>img.complete&&img.naturalWidth===5504)).toBe(true);
  await expect(page.locator('.featured-slide .media-caption')).toHaveCount(0);
  await page.getByRole('button',{name:'Next featured campaign'}).click();
+ await expect(slides.nth(3)).toBeVisible();
+ await expect(slides.nth(3)).toHaveAttribute('aria-label','4 of 4: product photography');
+ await page.getByRole('button',{name:'Next featured campaign'}).click();
  await expect(slides.nth(0)).toBeVisible();
+ await page.getByRole('button',{name:'Previous featured campaign'}).click();
+ await expect(slides.nth(3)).toBeVisible();
  await page.getByRole('button',{name:'Previous featured campaign'}).click();
  await expect(slides.nth(2)).toBeVisible();
  await page.getByRole('button',{name:'Previous featured campaign'}).click();
@@ -58,4 +63,49 @@ test('featured campaigns cycle and RIMOWA cover opens',async({page})=>{
  await page.getByRole('button',{name:'Close project'}).click();
  await page.locator('.hero-media').scrollIntoViewIfNeeded();
  await page.locator('.hero-media').screenshot({path:`/tmp/mastudio-rimowa-${test.info().project.name}.png`});
+});
+
+
+test('product cover cycles in order on hover and resets when leaving', async ({page, isMobile}) => {
+ test.skip(isMobile, 'Touch devices use the project viewer controls instead of hover.');
+ await page.goto('/');
+ const card = page.getByRole('button', {name:'View product photography', exact:true});
+ const gallery = card.locator('.product-gallery');
+ const active = gallery.locator('.is-active');
+ await card.scrollIntoViewIfNeeded();
+ await expect(active).toHaveAttribute('data-slide','1');
+ await card.hover();
+ await expect(active).toHaveAttribute('data-slide','2', {timeout:7000});
+ await expect.poll(()=>active.evaluate(img=>img.complete&&img.naturalWidth===1792)).toBe(true);
+ await expect(active).toHaveAttribute('data-slide','3', {timeout:5000});
+ await page.mouse.move(0,0);
+ await expect(active).toHaveAttribute('data-slide','1');
+ await page.clock.install();
+ await page.clock.runFor(3500);
+ await expect(active).toHaveAttribute('data-slide','1');
+ await card.hover();
+ await page.clock.runFor(3100);
+ await expect(active).toHaveAttribute('data-slide','2');
+ await page.mouse.move(0,0);
+ await expect(active).toHaveAttribute('data-slide','1');
+});
+
+test('product photos are available through manual viewer controls', async ({page}) => {
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await page.goto('/');
+ await page.getByRole('button',{name:'View product photography',exact:true}).click();
+ const gallery=page.getByRole('dialog').locator('.product-gallery');
+ const active=gallery.locator('.is-active');
+ await expect(active).toHaveAttribute('data-slide','1');
+ await page.getByRole('button',{name:'Next product photo'}).click();
+ await expect(active).toHaveAttribute('data-slide','2');
+ await page.getByRole('button',{name:'Next product photo'}).click();
+ await expect(active).toHaveAttribute('data-slide','3');
+ await page.getByRole('button',{name:'Next product photo'}).click();
+ await expect(active).toHaveAttribute('data-slide','1');
+ await page.getByRole('button',{name:'Previous product photo'}).click();
+ await expect(active).toHaveAttribute('data-slide','3');
+ await page.getByRole('button',{name:'Close project'}).click();
+ await page.getByRole('button',{name:'View product photography',exact:true}).click();
+ await expect(active).toHaveAttribute('data-slide','1');
 });

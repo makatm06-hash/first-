@@ -48,3 +48,7 @@ Adobe's monochrome symbol is sourced from Simple Icons 11.15.0: https://raw.gith
 ## Stone Island campaign
 
 `public/campaigns/stone-island-cover.png` is the unchanged original image supplied in `stoney.zip`. It replaces the third concept project and joins Saucony and RIMOWA as the third main showcase slide. Showcase counts are derived from the featured projects. The carousel retains manual controls and no title overlays.
+
+## Product photography
+
+The fourth project and showcase cover use the unchanged originals from `pdm.zip`, explicitly ordered as slide 1, slide 2, slide 3 under `public/campaigns/product-photography/`. Slide 1 is always the resting image. Mouse hover or keyboard focus starts a three-second loop; leaving resets to slide 1. Playback stops when the window loses focus, the page is hidden, or the featured campaign changes. Reduced-motion preferences disable automatic cycling. Opening the project provides manual photo controls for touch and keyboard use. Portrait originals retain their full composition.
