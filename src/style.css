@@ -4,10 +4,10 @@
 
 /* Equal-width groups keep the loop seamless at desktop and mobile sizes. */
 .clients .logo-group{min-width:100vw;flex-shrink:0;justify-content:space-around;gap:80px;padding:12px 40px}
-.clients .client-logo{display:inline-flex;align-items:center;justify-content:center;gap:12px;flex:0 0 160px;width:160px;height:56px;min-width:0;min-height:0;font-size:32px;letter-spacing:-1.5px;line-height:1.2;color:var(--ink)}
-.client-logo img{display:block;width:38px;height:38px;object-fit:contain}
+.clients .client-logo{display:inline-flex;align-items:center;justify-content:center;gap:10px;flex:0 0 136px;width:136px;height:48px;min-width:0;min-height:0;font-size:27px;letter-spacing:-1.5px;line-height:1.2;color:var(--ink)}
+.client-logo img{display:block;width:32px;height:32px;object-fit:contain}
 .clients .client-logo--artwork img{width:100%;height:100%;object-fit:contain}
-@media(max-width:560px){.clients .logo-group{gap:50px;padding-inline:25px}.clients .client-logo{flex-basis:140px;width:140px;height:48px;font-size:28px}.client-logo img{width:30px;height:30px}}
+@media(max-width:560px){.clients .logo-group{gap:50px;padding-inline:25px}.clients .client-logo{flex-basis:120px;width:120px;height:41px;font-size:24px}.client-logo img{width:26px;height:26px}}
 
 /* Preserve the supplied campaign composition and original image colours. */
 .hero-media--campaign{height:auto;aspect-ratio:16/9}

@@ -17,7 +17,6 @@ const clientBrands = [
  { name: 'Ninja', slug: 'ninja', logo: '/logos/ninja.png' },
  { name: 'Shark', slug: 'shark', logo: '/logos/shark.png' },
  { name: 'Sodii', slug: 'sodii', logo: '/logos/sodii.png' },
- { name: 'Budweiser', slug: 'budweiser', logo: '/logos/budweiser.png' },
  { name: 'Adobe', slug: 'adobe', logo: '/logos/adobe.svg' },
 ];
 const clientLogos = clientBrands.map(brand => `

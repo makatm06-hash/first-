@@ -16,7 +16,7 @@ Create a production build with `npm run build`; serve it with `npm run preview`.
 ## Current capabilities
 
 - Responsive portfolio, category filters, accessible modal project views.
-- Looping Ninja, Shark, Sodii, Budweiser, and Adobe brand strip, scroll reveals, reduced-motion support.
+- Looping Ninja, Shark, Sodii, and Adobe brand strip, scroll reveals, reduced-motion support.
 - “Edit media” accepts images and videos up to 100 MB, saved in IndexedDB in the current browser. This is a local demonstration, not a secure CMS. Uploads are not shared with other visitors.
 - Booking form validates required fields and downloads a plain-text request. It does **not** send email or submit a booking.
 
@@ -33,7 +33,7 @@ npx playwright test
 
 ## Client logo assets
 
-The client strip contains Ninja (kitchen appliances), Shark (home appliances), Sodii (Australian hydration), Budweiser, and Adobe. The four PNG logos were supplied by the user in `logos.zip` and are bundled unchanged under `public/logos/`. All logos are centered in matching responsive frames using `object-fit: contain` to preserve their original proportions. Adobe retains its existing symbol and text treatment.
+The client strip contains Ninja (kitchen appliances), Shark (home appliances), Sodii (Australian hydration), and Adobe. The three PNG logos were supplied by the user in `logos.zip` and are bundled unchanged under `public/logos/`. All logos are centered in matching responsive frames using `object-fit: contain` to preserve their original proportions. Adobe retains its existing symbol and text treatment.
 
 Adobe's monochrome symbol is sourced from Simple Icons 11.15.0: https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/adobe.svg. Simple Icons: https://github.com/simple-icons/simple-icons/tree/11.15.0 (CC0 collection; brand marks remain their owners' trademarks).
 
