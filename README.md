@@ -64,3 +64,7 @@ The original `videos.zip` exceeded the workspace transfer tool’s 32 MiB limit.
 - Stone Island: https://youtu.be/CIXPhkQkelI
 
 The existing cover images remain in the portfolio and showcase. YouTube players load only when a project opens, do not autoplay, support fullscreen and inline playback, and are removed on closing the viewer to stop playback. Each project also links to the original YouTube page. Product photography remains a static collage. Automated mapping tests mock the external frame response and do not establish remote video availability or playback permission.
+
+## Motion
+
+`src/motion.js` adds one-time scroll reveals and short staggered entrances across the hero, work, agency, booking, and footer sections. CSS adds restrained cover zoom, button feedback, a gentle studio symbol drift, showcase fades, and project viewer entrances. OS reduced-motion preferences disable movement immediately, including when changed during a visit. Keyboard-focused content is immediately visible; content also remains visible when IntersectionObserver is unavailable. No animation library or scroll event loop is required.

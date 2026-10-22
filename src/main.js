@@ -3,6 +3,7 @@ import '@fontsource/inter/500.css';
 import '@fontsource/inter/700.css';
 import '@fontsource/noto-sans-symbols-2/400.css';
 import './style.css';
+import { initMotion } from './motion.js';
 
 const projects = [
  {name:'Saucony',youtubeId:'JLWG4RrAMek',category:'Video campaigns',number:'01',image:'/campaigns/saucony-cover.png',alt:'Saucony campaign: three athletes in black and white with a lime-green Saucony logo',campaign:true,description:'Selected campaign imagery for Saucony.'},
@@ -38,8 +39,6 @@ document.querySelector('#app').innerHTML = `
 <dialog id="editor-dialog"><button class="close-dialog" aria-label="Close media editor">✕</button><div class="editor-content"><span class="eyebrow">YOUR WORK. YOUR WAY.</span><h2>Make it yours.</h2><p>Choose an image or video for each project. Media is saved in this browser only; it won’t update a published website.</p><div id="editor-fields">${projects.map((p,i)=>`<label class="upload-label">${p.number} / ${p.name}<input type="file" accept="image/*,video/*" data-upload="${i}"></label>`).join('')}</div><button id="reset-media" class="text-button">Restore campaign covers</button><p id="editor-status" role="status"></p></div></dialog>`;
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const observer = new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target);}}),{threshold:0.08});
-document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 document.querySelectorAll('[data-filter]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-filter]').forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-pressed',String(b===button));});document.querySelectorAll('.project').forEach(p=>{p.hidden=button.dataset.filter!=='All work'&&p.dataset.category!==button.dataset.filter;});}));
 let db;
 const media = new Map();
@@ -106,3 +105,5 @@ function showCampaign(direction) {
 }
 document.querySelector('#showcase-prev').addEventListener('click', () => showCampaign(-1));
 document.querySelector('#showcase-next').addEventListener('click', () => showCampaign(1));
+
+initMotion();
