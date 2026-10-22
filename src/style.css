@@ -72,3 +72,6 @@ input,textarea,select{transition:border-color .25s ease}
  .nav-cta:hover,.submit-button:hover,.showcase-controls button:hover,.close-dialog:hover{translate:none}
 }
 .motion-reveal:focus-within{transition:none}
+
+.clients .client-intro{font-size:11px;font-weight:300;letter-spacing:.025em;line-height:1.5;color:#65665f}
+@media(max-width:560px){.clients .client-intro{font-size:10px}}
