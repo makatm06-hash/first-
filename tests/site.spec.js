@@ -29,33 +29,34 @@ test('portfolio, media upload, and booking workflow',async({page})=>{
 });
 
 test('featured campaigns cycle and RIMOWA cover opens',async({page})=>{
+ await page.emulateMedia({reducedMotion:'reduce'});
  await page.goto('/');
  const slides=page.locator('.featured-slide');
- await expect(slides.nth(0)).toBeVisible();
- await expect(slides.nth(1)).toBeHidden();
+ await expect(slides.nth(0)).toHaveAttribute('data-active','true');
+ await expect(slides.nth(1)).toHaveAttribute('data-active','false');
  await page.getByRole('button',{name:'Next featured campaign'}).click();
- await expect(slides.nth(0)).toBeHidden();
- await expect(slides.nth(1)).toBeVisible();
+ await expect(slides.nth(0)).toHaveAttribute('data-active','false');
+ await expect(slides.nth(1)).toHaveAttribute('data-active','true');
  await expect(slides.nth(1)).toHaveAttribute('aria-label','2 of 4: a lifetime of lives');
  await expect(page.locator('#showcase-position')).toHaveText('02 / 04');
  await expect.poll(()=>slides.nth(1).locator('img').evaluate(img=>img.complete&&img.naturalWidth===3838)).toBe(true);
  await page.getByRole('button',{name:'Next featured campaign'}).click();
- await expect(slides.nth(2)).toBeVisible();
+ await expect(slides.nth(2)).toHaveAttribute('data-active','true');
  await expect(slides.nth(2)).toHaveAttribute('aria-label','3 of 4: Stone Island');
  await expect(page.locator('#showcase-position')).toHaveText('03 / 04');
  await expect.poll(()=>slides.nth(2).locator('img').evaluate(img=>img.complete&&img.naturalWidth===5504)).toBe(true);
  await expect(page.locator('.featured-slide .media-caption')).toHaveCount(0);
  await page.getByRole('button',{name:'Next featured campaign'}).click();
- await expect(slides.nth(3)).toBeVisible();
+ await expect(slides.nth(3)).toHaveAttribute('data-active','true');
  await expect(slides.nth(3)).toHaveAttribute('aria-label','4 of 4: Product photography');
  await page.getByRole('button',{name:'Next featured campaign'}).click();
- await expect(slides.nth(0)).toBeVisible();
+ await expect(slides.nth(0)).toHaveAttribute('data-active','true');
  await page.getByRole('button',{name:'Previous featured campaign'}).click();
- await expect(slides.nth(3)).toBeVisible();
+ await expect(slides.nth(3)).toHaveAttribute('data-active','true');
  await page.getByRole('button',{name:'Previous featured campaign'}).click();
- await expect(slides.nth(2)).toBeVisible();
+ await expect(slides.nth(2)).toHaveAttribute('data-active','true');
  await page.getByRole('button',{name:'Previous featured campaign'}).click();
- await expect(slides.nth(1)).toBeVisible();
+ await expect(slides.nth(1)).toHaveAttribute('data-active','true');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
  await page.getByRole('button',{name:'View a lifetime of lives',exact:true}).click();
  await expect(page.getByRole('dialog').getByRole('heading',{name:'a lifetime of lives',exact:true})).toBeVisible();
@@ -204,4 +205,63 @@ test('PDM loop moves smoothly, pauses, and stops for reduced motion',async({page
  await page.getByRole('button',{name:'Close project'}).click();
  await page.clock.runFor(3000);
  await expect.poll(()=>page.evaluate(()=>document.body.style.overflow)).toBe('');
+});
+
+
+test('cover carousel keeps vertical scrolling free while supporting horizontal browsing',async({page,isMobile})=>{
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await page.goto('/');
+ const stage=page.locator('.hero-media');
+ await stage.scrollIntoViewIfNeeded();
+ const box=await stage.boundingBox();
+ await page.mouse.move(box.x+box.width/2,box.y+box.height/2);
+ await page.mouse.wheel(520,0);
+ await expect(page.locator('#showcase-position')).toHaveText('02 / 04');
+ const before=await page.evaluate(()=>scrollY);
+ await page.mouse.wheel(0,450);
+ await expect.poll(()=>page.evaluate(()=>scrollY)).toBeGreaterThan(before+100);
+ await expect(page.locator('#showcase-position')).toHaveText('02 / 04');
+ await stage.scrollIntoViewIfNeeded();
+ await stage.focus();await page.keyboard.press('ArrowRight');
+ await expect(page.locator('#showcase-position')).toHaveText('03 / 04');
+ if(isMobile){
+  const session=await page.context().newCDPSession(page);
+  const area=await stage.boundingBox();
+  const y=area.y+area.height*.45;
+  await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:area.x+area.width*.8,y}]});
+  await session.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:area.x+area.width*.2,y}]});
+  await session.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  await expect(page.locator('#showcase-position')).toHaveText('04 / 04');
+  const area2=await stage.boundingBox();
+  const previous=await page.evaluate(()=>scrollY);
+  const startY=area2.y+area2.height*.85;
+  await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:area2.x+area2.width/2,y:startY}]});
+  for(let i=1;i<=5;i++)await session.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:area2.x+area2.width/2,y:startY-i*25}]});
+  await session.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  await expect.poll(()=>page.evaluate(()=>scrollY)).toBeGreaterThan(previous+30);
+ }
+ await page.getByRole('heading',{name:'View our work',exact:true}).scrollIntoViewIfNeeded();
+ await expect(page.getByRole('heading',{name:'View our work',exact:true})).toBeInViewport();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+});
+
+test('cover loop animates, pauses, and respects reduced motion',async({page})=>{
+ await page.goto('/');
+ await page.locator('.hero-media').scrollIntoViewIfNeeded();
+ const first=page.locator('.featured-slide').first();
+ await expect.poll(()=>first.getAttribute('data-distance')).not.toBe('0.000');
+ await page.clock.install();
+ const initial=await first.getAttribute('data-distance');
+ await page.clock.runFor(14000);
+ expect(await first.getAttribute('data-distance')).not.toBe(initial);
+ await page.getByRole('button',{name:'Pause featured campaign loop'}).click();
+ await page.clock.runFor(1500);
+ const paused=await first.getAttribute('style');
+ await page.clock.runFor(3000);
+ await expect(first).toHaveAttribute('style',paused);
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await expect(page.locator('#showcase-play')).toBeHidden();
+ const reduced=await first.getAttribute('style');
+ await page.clock.runFor(12000);
+ await expect(first).toHaveAttribute('style',reduced);
 });

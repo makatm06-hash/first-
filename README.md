@@ -68,3 +68,8 @@ The existing cover images remain in the portfolio and showcase. YouTube players 
 ## Motion
 
 `src/motion.js` adds one-time scroll reveals and short staggered entrances across the hero, work, agency, booking, and footer sections. CSS adds restrained cover zoom, button feedback, a gentle studio symbol drift, showcase fades, and project viewer entrances. OS reduced-motion preferences disable movement immediately, including when changed during a visit. Keyboard-focused content is immediately visible; content also remains visible when IntersectionObserver is unavailable. No animation library or scroll event loop is required.
+
+
+## Cover carousel
+
+`src/cover-carousel.js` arranges the featured covers around a larger central image with a slow continuous loop, pause and arrow controls, horizontal trackpad scrolling, and mouse/touch dragging. Vertical wheel and touch gestures keep their native page scrolling; the carousel has no pinned scroll sequence. It stops animating offscreen and respects reduced-motion preferences.
