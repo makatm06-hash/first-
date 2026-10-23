@@ -91,8 +91,9 @@ test('product collage stays static and portfolio covers align', async ({page, is
  }
  await card.click();
  await expect(page.getByRole('dialog').getByRole('heading',{name:'Product photography',exact:true})).toBeVisible();
- await expect(page.locator('.detail-media img')).toHaveAttribute('src','/campaigns/product-photography/collage.png');
- await expect(page.getByRole('button',{name:'Next product photo'})).toHaveCount(0);
+ await expect(page.locator('#pdm-dialog')).toBeVisible();
+ await expect(page.locator('#pdm-dialog .pdm-card img')).toHaveCount(9);
+ await expect(page.getByRole('button',{name:'Next product photo'})).toBeVisible();
  await page.getByRole('button',{name:'Close project'}).click();
  await page.locator('.work').screenshot({path:`/tmp/mastudio-even-covers-${isMobile?'mobile':'desktop'}.png`});
 });
@@ -118,6 +119,83 @@ test('each campaign opens its matching YouTube player and removes it on close', 
   await expect(page.locator('iframe')).toHaveCount(0);
  }
  await page.getByRole('button',{name:'View Product photography',exact:true}).click();
- await expect(page.locator('.detail-media img')).toHaveAttribute('src','/campaigns/product-photography/collage.png');
+ await expect(page.locator('#pdm-dialog')).toBeVisible();
+ await expect(page.locator('#pdm-dialog .pdm-card img')).toHaveCount(9);
  await expect(page.locator('iframe')).toHaveCount(0);
+});
+
+
+test('PDM opens a full-screen depth gallery with looping controls and drag', async ({page,isMobile}) => {
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await page.goto('/');
+ const card=page.getByRole('button',{name:'View Product photography',exact:true});
+ await card.click();
+ const dialog=page.locator('#pdm-dialog');
+ const stage=dialog.locator('.pdm-stage');
+ await expect(dialog).toBeVisible();
+ const bounds=await dialog.boundingBox();
+ expect(bounds.width).toBe(page.viewportSize().width);
+ expect(bounds.height).toBe(page.viewportSize().height);
+ await expect.poll(()=>dialog.locator('img').evaluateAll(imgs=>imgs.every(img=>img.complete&&img.naturalWidth===1792))).toBe(true);
+ const depths=await dialog.locator('.pdm-card').evaluateAll(cards=>cards.map(card=>({distance:Number(card.dataset.distance),width:card.getBoundingClientRect().width})));
+ expect(depths.find(card=>card.distance===0).width).toBeGreaterThan(depths.find(card=>card.distance===1).width);
+ await expect(dialog.locator('.pdm-counter')).toHaveText('01 / 03');
+ for(const count of ['02 / 03','03 / 03','01 / 03']){
+  await page.getByRole('button',{name:'Next product photo'}).click();
+  await expect(dialog.locator('.pdm-counter')).toHaveText(count);
+ }
+ await page.getByRole('button',{name:'Previous product photo'}).click();
+ await expect(dialog.locator('.pdm-counter')).toHaveText('03 / 03');
+ await stage.focus();await page.keyboard.press('ArrowRight');
+ await expect(dialog.locator('.pdm-counter')).toHaveText('01 / 03');
+ const box=await stage.boundingBox();
+ if(isMobile){
+  const session=await page.context().newCDPSession(page);
+  const y=box.y+box.height/2;
+  await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:box.width*.8,y}]});
+  await session.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:box.width*.3,y}]});
+  await session.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+ }else{
+  await page.mouse.move(box.width*.7,box.y+box.height/2);await page.mouse.down();
+  await page.mouse.move(box.width*.7-250,box.y+box.height/2,{steps:8});await page.mouse.up();
+ }
+ await expect(dialog.locator('.pdm-counter')).toHaveText('02 / 03');
+ await expect(page.getByRole('button',{name:'Pause image loop'})).toBeHidden();
+ await page.screenshot({path:`/tmp/pdm-depth-${isMobile?'mobile':'desktop'}.png`});
+ await page.keyboard.press('Escape');
+ await expect(dialog).toBeHidden();
+ await expect(card).toBeFocused();
+ await expect.poll(()=>page.evaluate(()=>document.body.style.overflow)).toBe('');
+ await card.click();await expect(dialog.locator('.pdm-counter')).toHaveText('01 / 03');
+ await page.getByRole('button',{name:'Close project'}).click();
+ await page.getByRole('button',{name:'View Saucony',exact:true}).click();
+ await expect(page.locator('#project-dialog iframe')).toHaveCount(1);
+});
+
+test('PDM loop moves smoothly, pauses, and stops for reduced motion',async({page})=>{
+ await page.goto('/');
+ await page.getByRole('button',{name:'View Product photography',exact:true}).click();
+ const stage=page.locator('#pdm-dialog .pdm-stage');
+ const card=page.locator('#pdm-dialog .pdm-card').first();
+ await page.clock.install();
+ const initial=await card.getAttribute('data-distance');
+ await page.clock.runFor(15000);
+ expect(await card.getAttribute('data-distance')).not.toBe(initial);
+ await expect(page.locator('.pdm-counter')).toHaveText('02 / 03');
+ await page.getByRole('button',{name:'Pause image loop'}).click();
+ await page.clock.runFor(1500);
+ const paused=await card.getAttribute('style');
+ await page.clock.runFor(3000);
+ await expect(card).toHaveAttribute('style',paused);
+ await stage.dispatchEvent('wheel',{deltaY:420,deltaMode:0});
+ await page.clock.runFor(1500);
+ expect(await card.getAttribute('style')).not.toBe(paused);
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await expect(page.locator('#pdm-dialog .pdm-play')).toBeHidden();
+ const reduced=await card.getAttribute('style');
+ await page.clock.runFor(12000);
+ await expect(card).toHaveAttribute('style',reduced);
+ await page.getByRole('button',{name:'Close project'}).click();
+ await page.clock.runFor(3000);
+ await expect.poll(()=>page.evaluate(()=>document.body.style.overflow)).toBe('');
 });
