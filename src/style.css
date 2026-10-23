@@ -72,6 +72,37 @@ input,textarea,select{transition:border-color .25s ease}
  .nav-cta:hover,.submit-button:hover,.showcase-controls button:hover,.close-dialog:hover{translate:none}
 }
 .motion-reveal:focus-within{transition:none}
+/* Keep filter hit targets still when focus arrives during their entrance. */
+.work-toolbar.motion-reveal{translate:none}
+
+/* Small secondary entrances give the content a quiet, staggered rhythm. */
+.services.motion-in>span,#booking-form.motion-in>.form-row,#booking-form.motion-in>label{animation:detail-arrive .65s var(--motion-ease) backwards;animation-delay:calc(var(--reveal-delay,0ms) + var(--detail-delay,0ms))}
+.services>span:nth-child(2),#booking-form>:nth-child(2){--detail-delay:40ms}
+.services>span:nth-child(3),#booking-form>:nth-child(3){--detail-delay:80ms}
+.services>span:nth-child(4),#booking-form>:nth-child(4){--detail-delay:120ms}
+#booking-form.motion-in>:focus-within{animation:none}
+@keyframes detail-arrive{from{opacity:0;translate:0 6px}to{opacity:1;translate:0 0}}
+
+/* Underlines and directional cues respond to both pointer and keyboard. */
+.nav nav>a:not(.nav-cta),.footer-top>a{position:relative}
+.nav nav>a:not(.nav-cta)::after,.footer-top>a::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:1px;background:currentColor;scale:0 1;transform-origin:left;transition:scale .4s var(--motion-ease)}
+.nav nav>a:not(.nav-cta):focus-visible::after,.footer-top>a:focus-visible::after{scale:1 1}
+.nav-cta>span,.submit-button>span,.showcase-controls svg{display:inline-block;transition:translate .4s var(--motion-ease)}
+.project-caption{transition:translate .5s var(--motion-ease)}
+.project:focus-visible .project-open{transform:translate(2px,-2px);background:#dce5c8}
+.nav-cta:focus-visible>span,.submit-button:focus-visible>span{translate:2px -2px}
+.round-link:focus-visible b{transform:translateY(3px)}
+@media(hover:hover) and (pointer:fine){
+ .nav nav>a:not(.nav-cta):hover::after,.footer-top>a:hover::after{scale:1 1}
+ .nav-cta:hover>span,.submit-button:hover>span{translate:2px -2px}
+ #showcase-prev:hover svg{translate:-2px 0}
+ #showcase-next:hover svg{translate:2px 0}
+ .project:hover .project-caption{translate:0 -2px}
+}
+@media(prefers-reduced-motion:reduce){
+ .project-caption,.nav-cta>span,.submit-button>span,.showcase-controls svg{translate:none!important}
+ .project:focus-visible .project-open,.round-link:focus-visible b{transform:none}
+}
 
 .clients .client-intro{font-size:11px;font-weight:400;letter-spacing:.18em;line-height:1.5;text-transform:uppercase;color:#65665f}
 @media(max-width:560px){.clients .client-intro{font-size:10px}}

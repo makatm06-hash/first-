@@ -1,3 +1,37 @@
+const filterAnimations = new Map();
+
+// Filtering stays immediate; a short settle softens the visible layout change.
+export function filterProjects(category) {
+ const cards = [...document.querySelectorAll('.project')];
+ const previous = new Map(cards.filter(card => !card.hidden).map(card => [card, card.getBoundingClientRect()]));
+ filterAnimations.forEach(animation => animation.cancel());
+ filterAnimations.clear();
+ cards.forEach(card => { card.hidden = category !== 'All work' && card.dataset.category !== category; });
+ if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+ let stagger = 0;
+ for (const card of cards) {
+  if (card.hidden || !card.animate) continue;
+  const bounds = card.getBoundingClientRect();
+  if (bounds.bottom <= 0 || bounds.top >= innerHeight) continue;
+  // Let the intersection reveal handle cards that have not entered yet.
+  if (card.classList.contains('motion-reveal') && !card.classList.contains('motion-in')) continue;
+  const before = previous.get(card);
+  const dx = before ? before.left - bounds.left : 0;
+  const dy = before ? before.top - bounds.top : 0;
+  if (before && Math.abs(dx) < 1 && Math.abs(dy) < 1) continue;
+  // Large grid changes get a small fade-up instead of a long journey.
+  const nearby = before && Math.hypot(dx, dy) < 80;
+  const animation = card.animate([
+   { transform: `translate(${nearby ? dx : 0}px, ${nearby ? dy : 10}px)`, opacity: nearby ? 1 : .35 },
+   { transform: 'translate(0, 0)', opacity: 1 },
+  ], { duration: 460, delay: Math.min(stagger++ * 35, 70), easing: 'cubic-bezier(.22,1,.36,1)', fill: 'backwards' });
+  filterAnimations.set(card, animation);
+  const clear = () => { if (filterAnimations.get(card) === animation) filterAnimations.delete(card); };
+  animation.finished.then(clear, clear);
+ }
+}
+
 // Small, one-time reveals; content stays visible if motion is unsupported.
 export function initMotion() {
  const preference = matchMedia('(prefers-reduced-motion: reduce)');
@@ -19,6 +53,8 @@ export function initMotion() {
  let observer;
  function sync() {
   observer?.disconnect();
+  filterAnimations.forEach(animation => animation.cancel());
+  filterAnimations.clear();
   targets.forEach((_, element) => element.classList.remove('motion-reveal', 'motion-in'));
   const enabled = !preference.matches && 'IntersectionObserver' in window;
   document.documentElement.dataset.motion = enabled ? 'enabled' : 'reduced';
