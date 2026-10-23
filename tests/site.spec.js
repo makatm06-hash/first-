@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 test('portfolio and booking workflow',async({page})=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.route('https://formspree.io/f/mvkkojpb',route=>route.fulfill({json:{ok:true}}));
  await page.goto('/');
  await expect(page.getByRole('heading',{name:'IDEAS MEANT TO SCALE.'})).toBeVisible();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
@@ -14,10 +15,14 @@ test('portfolio and booking workflow',async({page})=>{
  await page.getByLabel('Email address').fill('test@example.com');
  await page.getByLabel('What can we help with?').selectOption('Still-image campaign');
  await page.getByLabel('A little about your project').fill('A brand photography project.');
- const download=page.waitForEvent('download');
- await page.getByRole('button',{name:'Prepare booking request'}).click();
- expect((await download).suggestedFilename()).toBe('mastudio-booking-request.txt');
- await expect(page.locator('#form-status')).toContainText('It has not been sent');
+ const submission=page.waitForRequest('https://formspree.io/f/mvkkojpb');
+ await page.getByRole('button',{name:'Send enquiry'}).click();
+ const request=await submission;
+ expect(request.method()).toBe('POST');
+ const fields=await new Response(request.postDataBuffer(),{headers:{'Content-Type':request.headers()['content-type']}}).formData();
+ expect(Object.fromEntries(fields)).toMatchObject({name:'Test Person',email:'test@example.com',service:'Still-image campaign',message:'A brand photography project.',_gotcha:''});
+ await expect(page.locator('#form-status')).toContainText('your enquiry has been sent');
+ await expect(page.getByLabel('Your name')).toHaveValue('');
  await page.screenshot({path:`/tmp/mastudio-${test.info().project.name}.png`,fullPage:true});
  expect(errors).toEqual([]);
 });
@@ -174,11 +179,11 @@ test('PDM opens a full-screen depth gallery with looping controls and drag', asy
 });
 
 test('PDM loop moves smoothly, pauses, and stops for reduced motion',async({page})=>{
+ await page.clock.install();
  await page.goto('/');
  await page.getByRole('button',{name:'View Product photography',exact:true}).click();
  const stage=page.locator('#pdm-dialog .pdm-stage');
  const card=page.locator('#pdm-dialog .pdm-card').first();
- await page.clock.install();
  const initial=await card.getAttribute('data-distance');
  await page.clock.runFor(15000);
  expect(await card.getAttribute('data-distance')).not.toBe(initial);
@@ -240,11 +245,11 @@ test('cover carousel keeps vertical scrolling free while supporting horizontal b
 });
 
 test('cover loop animates, pauses, and respects reduced motion',async({page})=>{
+ await page.clock.install();
  await page.goto('/');
  await page.locator('.hero-media').scrollIntoViewIfNeeded();
  const first=page.locator('.featured-slide').first();
  await expect.poll(()=>first.getAttribute('data-distance')).not.toBe('0.000');
- await page.clock.install();
  const initial=await first.getAttribute('data-distance');
  await page.clock.runFor(14000);
  expect(await first.getAttribute('data-distance')).not.toBe(initial);

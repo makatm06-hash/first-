@@ -18,11 +18,11 @@ Create a production build with `npm run build`; serve it with `npm run preview`.
 - Responsive portfolio, category filters, accessible modal project views.
 - Looping Ninja, Shark, Sodii, and Adobe brand strip, scroll reveals, reduced-motion support.
 - “Edit media” accepts images and videos up to 100 MB, saved in IndexedDB in the current browser. This is a local demonstration, not a secure CMS. Uploads are not shared with other visitors.
-- Booking form validates required fields and downloads a plain-text request. It does **not** send email or submit a booking.
+- Project enquiries are submitted to Formspree and emailed to the recipient configured in its dashboard. The form includes required-field validation, spam honeypot, pending/success/error states, duplicate-submit protection, and a 20-second timeout. Failed submissions keep the visitor’s details for retry.
 
 ## Before publishing
 
-Replace sample projects, bundled concept artwork, and studio copy. Connect authenticated media management and hosting for permanent uploads. Connect a booking API/email provider, add server-side validation and abuse protection, and publish the relevant privacy information. No credentials should be included in client-side code.
+Replace sample projects, bundled concept artwork, and studio copy. Connect authenticated media management and hosting for permanent uploads. Verify the Formspree recipient and notification settings, send a live test enquiry to confirm delivery, and publish the relevant privacy information. No credentials should be included in client-side code.
 
 ## Browser checks
 
@@ -73,3 +73,8 @@ The existing cover images remain in the portfolio and showcase. YouTube players 
 ## Cover carousel
 
 `src/cover-carousel.js` arranges the featured covers around a larger central image with a slow continuous loop, pause and arrow controls, horizontal trackpad scrolling, and mouse/touch dragging. Vertical wheel and touch gestures keep their native page scrolling; the carousel has no pinned scroll sequence. It stops animating offscreen and respects reduced-motion preferences.
+
+
+## Email enquiries
+
+The form posts to the public endpoint `https://formspree.io/f/mvkkojpb` with an `email` field for replies and the name, service, ideal date, budget, and project brief. Manage the receiving email, email notifications, and spam settings in Formspree; no email password or secret key is bundled in the site. Browser checks mock Formspree responses and do not send real emails or confirm inbox delivery.

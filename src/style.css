@@ -192,3 +192,8 @@ input,textarea,select{transition:border-color .25s ease}
 @media(prefers-reduced-motion:reduce){.hero-media .featured-slide{will-change:auto}}
 
 .hero-media.motion-reveal{translate:none}
+
+.booking-trap{display:none}
+.submit-button:disabled{opacity:.65;cursor:wait;translate:none}
+#form-status[data-state="success"]{color:#3e5b2e}
+#form-status[data-state="error"]{color:#923c2e}
