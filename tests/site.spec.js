@@ -47,7 +47,7 @@ test('featured campaigns cycle and RIMOWA cover opens',async({page})=>{
  await expect(page.locator('.featured-slide .media-caption')).toHaveCount(0);
  await page.getByRole('button',{name:'Next featured campaign'}).click();
  await expect(slides.nth(3)).toBeVisible();
- await expect(slides.nth(3)).toHaveAttribute('aria-label','4 of 4: product photography');
+ await expect(slides.nth(3)).toHaveAttribute('aria-label','4 of 4: Product photography');
  await page.getByRole('button',{name:'Next featured campaign'}).click();
  await expect(slides.nth(0)).toBeVisible();
  await page.getByRole('button',{name:'Previous featured campaign'}).click();
@@ -69,7 +69,7 @@ test('featured campaigns cycle and RIMOWA cover opens',async({page})=>{
 test('product collage stays static and portfolio covers align', async ({page, isMobile}) => {
  await page.emulateMedia({reducedMotion:'reduce'});
  await page.goto('/');
- const card=page.getByRole('button',{name:'View product photography',exact:true});
+ const card=page.getByRole('button',{name:'View Product photography',exact:true});
  const cover=card.locator('.project-image img');
  await card.scrollIntoViewIfNeeded();
  await expect(cover).toHaveAttribute('src','/campaigns/product-photography/collage.png');
@@ -90,7 +90,7 @@ test('product collage stays static and portfolio covers align', async ({page, is
   expect(Math.abs(boxes[2].top-boxes[3].top)).toBeLessThan(1);
  }
  await card.click();
- await expect(page.getByRole('dialog').getByRole('heading',{name:'product photography',exact:true})).toBeVisible();
+ await expect(page.getByRole('dialog').getByRole('heading',{name:'Product photography',exact:true})).toBeVisible();
  await expect(page.locator('.detail-media img')).toHaveAttribute('src','/campaigns/product-photography/collage.png');
  await expect(page.getByRole('button',{name:'Next product photo'})).toHaveCount(0);
  await page.getByRole('button',{name:'Close project'}).click();
@@ -117,7 +117,7 @@ test('each campaign opens its matching YouTube player and removes it on close', 
   await page.getByRole('button',{name:'Close project'}).click();
   await expect(page.locator('iframe')).toHaveCount(0);
  }
- await page.getByRole('button',{name:'View product photography',exact:true}).click();
+ await page.getByRole('button',{name:'View Product photography',exact:true}).click();
  await expect(page.locator('.detail-media img')).toHaveAttribute('src','/campaigns/product-photography/collage.png');
  await expect(page.locator('iframe')).toHaveCount(0);
 });
