@@ -1,3 +1,5 @@
+import { arrowIcon } from './icons.js';
+
 const stills = [
  { source: '/campaigns/product-photography/still-1.png', description: 'A close-up of a dark Parfums de Marly bottle in warm sunlight.' },
  { source: '/campaigns/product-photography/still-2.png', description: 'Parfums de Marly fragrance bottles among chess pieces and vanilla pods.' },
@@ -29,8 +31,8 @@ export function initPdmGallery() {
     <div class="pdm-controls">
      <button class="pdm-play" type="button" aria-label="Pause image loop">Pause <span aria-hidden="true">Ⅱ</span></button>
      <span class="pdm-counter" aria-live="off">01 / ${String(stills.length).padStart(2, '0')}</span>
-     <button class="pdm-prev" type="button" aria-label="Previous product photo">←</button>
-     <button class="pdm-next" type="button" aria-label="Next product photo">→</button>
+     <button class="pdm-prev" type="button" aria-label="Previous product photo">${arrowIcon('left')}</button>
+     <button class="pdm-next" type="button" aria-label="Next product photo">${arrowIcon('right')}</button>
     </div>
    </footer>
    <p class="pdm-description visually-hidden" aria-live="polite"></p>

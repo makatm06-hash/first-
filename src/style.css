@@ -197,3 +197,11 @@ input,textarea,select{transition:border-color .25s ease}
 .submit-button:disabled{opacity:.65;cursor:wait;translate:none}
 #form-status[data-state="success"]{color:#3e5b2e}
 #form-status[data-state="error"]{color:#923c2e}
+
+/* Arrow shapes come from SVG, never platform emoji fonts. */
+.arrow-icon{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:middle;overflow:visible}
+.project-open .arrow-icon{width:21px;height:21px}
+.text-button .arrow-icon{width:14px;height:14px;margin-left:3px}
+.footer-top>a{display:inline-flex;align-items:center;gap:6px}
+.footer-top .arrow-icon{width:12px;height:12px}
+.pdm-controls .arrow-icon{width:20px;height:20px}
