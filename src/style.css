@@ -201,3 +201,9 @@ input,textarea,select{transition:border-color .25s ease}
 .footer-top .arrow-icon{width:12px;height:12px}
 .pdm-controls .arrow-icon{width:20px;height:20px}
 .work>.section-kicker{justify-content:flex-end}
+
+/* Simplify phone layouts while preserving the desktop typography and cards. */
+@media(max-width:560px){
+ .hero h1 .outline{color:var(--ink);-webkit-text-stroke:0;letter-spacing:inherit}
+ .work .project-open,.work .project-caption>span{display:none}
+}
