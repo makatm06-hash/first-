@@ -91,8 +91,9 @@ test('product collage stays static and portfolio covers align', async ({page, is
  }
  await card.click();
  await expect(page.getByRole('dialog').getByRole('heading',{name:'Product photography',exact:true})).toBeVisible();
- await expect(page.locator('.detail-media img')).toHaveAttribute('src','/campaigns/product-photography/collage.png');
- await expect(page.getByRole('button',{name:'Next product photo'})).toHaveCount(0);
+ await expect(page.locator('.still-gallery-group:not([aria-hidden]) img')).toHaveCount(3);
+ await expect(page.locator('.still-gallery-group:not([aria-hidden]) img').first()).toHaveAttribute('src','/campaigns/product-photography/still-1.png');
+ await expect(page.getByRole('button',{name:'Next product photo'})).toBeVisible();
  await page.getByRole('button',{name:'Close project'}).click();
  await page.locator('.work').screenshot({path:`/tmp/mastudio-even-covers-${isMobile?'mobile':'desktop'}.png`});
 });
@@ -118,6 +119,31 @@ test('each campaign opens its matching YouTube player and removes it on close', 
   await expect(page.locator('iframe')).toHaveCount(0);
  }
  await page.getByRole('button',{name:'View Product photography',exact:true}).click();
- await expect(page.locator('.detail-media img')).toHaveAttribute('src','/campaigns/product-photography/collage.png');
+ await expect(page.locator('.still-gallery-group:not([aria-hidden]) img')).toHaveCount(3);
+ await expect(page.locator('.still-gallery-group:not([aria-hidden]) img').first()).toHaveAttribute('src','/campaigns/product-photography/still-1.png');
  await expect(page.locator('iframe')).toHaveCount(0);
+});
+
+
+test('product still viewer loops, responds to controls, and resets on reopening', async ({page}) => {
+ await page.goto('/');
+ const card=page.getByRole('button',{name:'View Product photography',exact:true});
+ await card.click();
+ const gallery=page.locator('.still-gallery');
+ await expect.poll(()=>gallery.evaluate(el=>el.scrollLeft)).toBeGreaterThan(0);
+ const start=await gallery.evaluate(el=>el.scrollLeft);
+ await page.getByRole('button',{name:'Next product photo'}).click();
+ await expect.poll(()=>gallery.evaluate(el=>el.scrollLeft)).toBeGreaterThan(start+50);
+ await gallery.focus();
+ await page.keyboard.press('ArrowLeft');
+ await expect.poll(()=>gallery.evaluate((el,origin)=>Math.abs(el.scrollLeft-origin),start)).toBeLessThan(3);
+ await page.emulateMedia({reducedMotion:'reduce'});
+ for(let i=0;i<10;i++) await page.getByRole('button',{name:'Next product photo'}).click();
+ expect(await gallery.evaluate(el=>{const period=el.firstElementChild.getBoundingClientRect().width;return el.scrollLeft>=period*.5-1&&el.scrollLeft<period*1.5+1})).toBeTruthy();
+ await gallery.dispatchEvent('wheel',{deltaY:180,deltaMode:0});
+ expect(await gallery.evaluate(el=>el.scrollLeft)).toBeGreaterThan(0);
+ await page.getByRole('button',{name:'Close project'}).click();
+ await card.click();
+ await expect.poll(()=>gallery.evaluate(el=>Math.abs(el.scrollLeft-el.firstElementChild.getBoundingClientRect().width))).toBeLessThan(2);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
 });

@@ -4,12 +4,13 @@ import '@fontsource/inter/700.css';
 import '@fontsource/noto-sans-symbols-2/400.css';
 import './style.css';
 import { filterProjects, initMotion } from './motion.js';
+import { mountStillGallery } from './still-gallery.js';
 
 const projects = [
  {name:'Saucony',youtubeId:'JLWG4RrAMek',category:'Video campaigns',number:'01',image:'/campaigns/saucony-cover.png',alt:'Saucony campaign: three athletes in black and white with a lime-green Saucony logo',campaign:true,description:'Selected campaign imagery for Saucony.'},
  {name:'a lifetime of lives',youtubeId:'yZzb0bxzl5I',client:'RIMOWA',category:'Video campaigns',number:'02',image:'/campaigns/rimowa-a-lifetime-of-lives.png',alt:'RIMOWA campaign: a woman sitting behind a silver suitcase in a warmly lit living room',campaign:true,description:'RIMOWA — a lifetime of lives.'},
  {name:'Stone Island',youtubeId:'CIXPhkQkelI',category:'Video campaigns',number:'03',image:'/campaigns/stone-island-cover.png',alt:'Stone Island campaign: a model in a black jacket on a rugged landscape beneath a drone',campaign:true,description:'Selected campaign imagery for Stone Island.'},
- {name:'Product photography',category:'Still images',number:'04',image:'/campaigns/product-photography/collage.png',alt:'Product photography collage: fragrance bottles, chess pieces, and warm golden light',campaign:true,description:'A product photography series exploring fragrance, light, and texture.'},
+ {name:'Product photography',stills:[1,2,3].map(n=>`/campaigns/product-photography/still-${n}.png`),category:'Still images',number:'04',image:'/campaigns/product-photography/collage.png',alt:'Product photography collage: fragrance bottles, chess pieces, and warm golden light',campaign:true,description:'A product photography series exploring fragrance, light, and texture.'},
  {name:'Fashion campaigns',category:'Fashion campaigns',number:'05',image:'/campaigns/fashion-campaigns.png',alt:'On fashion campaign collage featuring athletes in running apparel and trainers against blue skies',campaign:true,featured:false,description:'Fashion campaign imagery for On.'},
 ];
 const featuredProjects = projects.filter(project => project.campaign && project.featured !== false);
@@ -45,7 +46,9 @@ const media = new Map();
 const urls = new Map();
 function openDatabase(){return new Promise((resolve,reject)=>{const request=indexedDB.open('mastudio-media',1);request.onupgradeneeded=()=>request.result.createObjectStore('projects');request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});}
 function storeMedia(key,value){return new Promise((resolve,reject)=>{const tx=db.transaction('projects','readwrite');const store=tx.objectStore('projects');value?store.put(value,key):store.clear();tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});}
+let disposeGallery;
 function renderMedia(i, container, controls = false) {
+ if (controls) { disposeGallery?.(); disposeGallery = null; }
  const project = projects[i];
  const saved = media.get(i);
  const localUrl = urls.get(i);
@@ -53,8 +56,11 @@ function renderMedia(i, container, controls = false) {
  const videoSource = saved?.type.startsWith('video/') ? localUrl : controls && !saved ? project.video : null;
  const youtubeId = controls && !saved ? project.youtubeId : null;
  container.classList.toggle('detail-media--video', Boolean(controls && (youtubeId || videoSource)));
+ container.classList.remove('detail-media--gallery');
  container.replaceChildren();
- if (youtubeId) {
+ if (controls && !saved && project.stills) {
+  disposeGallery = mountStillGallery(container, project.stills);
+ } else if (youtubeId) {
   const player = document.createElement('iframe');
   player.src = `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&playsinline=1`;
   player.title = `${project.name} campaign film`;
@@ -86,7 +92,7 @@ openDatabase().then(database=>{db=database;const req=db.transaction('projects').
 const projectDialog=document.querySelector('#project-dialog');
 document.querySelectorAll('[data-project]').forEach(card=>card.addEventListener('click',()=>{const i=Number(card.dataset.project);const p=projects[i];const detail=document.querySelector('#project-detail');detail.innerHTML=`<div class="detail-media"></div><div class="detail-copy"><span class="eyebrow">${p.category} / ${p.number}</span><h2>${p.name}</h2><p>${p.description}</p>${p.youtubeId ? `<a class="youtube-link" href="https://www.youtube.com/watch?v=${p.youtubeId}" target="_blank" rel="noopener noreferrer">Watch on YouTube</a>` : ''}<a class="text-button" href="#booking" id="project-enquiry">Start a project like this ↗</a></div>`;renderMedia(i,detail.querySelector('.detail-media'),true);detail.querySelector('#project-enquiry').onclick=()=>projectDialog.close();projectDialog.showModal();}));
 document.querySelectorAll('.close-dialog').forEach(b=>b.onclick=()=>b.closest('dialog').close());
-document.querySelectorAll('dialog').forEach(d=>{d.addEventListener('click',e=>{if(e.target===d)d.close();});d.addEventListener('close',()=>{d.querySelectorAll('video').forEach(v=>v.pause());d.querySelectorAll('iframe').forEach(frame=>frame.remove());});});
+document.querySelectorAll('dialog').forEach(d=>{d.addEventListener('click',e=>{if(e.target===d)d.close();});d.addEventListener('close',()=>{if(d===projectDialog){disposeGallery?.();disposeGallery=null;}d.querySelectorAll('video').forEach(v=>v.pause());d.querySelectorAll('iframe').forEach(frame=>frame.remove());});});
 const editor=document.querySelector('#editor-dialog');
 document.getElementById('edit-media').onclick=()=>editor.showModal();
 document.querySelectorAll('[data-upload]').forEach(input=>input.onchange=async()=>{const file=input.files[0];if(!file)return;const status=document.querySelector('#editor-status');if(!/^(image|video)\//.test(file.type)){status.textContent='Please choose an image or video.';return;}if(file.size>100*1024*1024){status.textContent='Please choose a file smaller than 100 MB.';return;}const i=Number(input.dataset.upload);try{if(db)await storeMedia(i,file);if(urls.has(i))URL.revokeObjectURL(urls.get(i));media.set(i,file);urls.set(i,URL.createObjectURL(file));updateCard(i);status.textContent=db?'Media saved in this browser.':'Media updated for this visit.';}catch{status.textContent='Could not save this file. Browser storage may be full.';}});
