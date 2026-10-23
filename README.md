@@ -27,6 +27,7 @@ Replace sample projects, bundled concept artwork, and studio copy. Connect authe
 ## Browser checks
 
 ```sh
+npm run build
 npx playwright test
 # Set CHROMIUM_PATH if Chromium is not installed at /usr/bin/chromium.
 ```
@@ -78,3 +79,8 @@ The existing cover images remain in the portfolio and showcase. YouTube players 
 ## Email enquiries
 
 The form posts to the public endpoint `https://formspree.io/f/mvkkojpb` with an `email` field for replies and the name, service, ideal date, budget, and project brief. Manage the receiving email, email notifications, and spam settings in Formspree; no email password or secret key is bundled in the site. Browser checks mock Formspree responses and do not send real emails or confirm inbox delivery.
+
+
+## Security
+
+Vercel security headers are configured in `vercel.json`; the enquiry form omits cookies and refuses redirects. See [SECURITY.md](SECURITY.md) for the review findings, remaining account checks, and verification limits.

@@ -2,3 +2,10 @@ node_modules/
 dist/
 test-results/
 playwright-report/
+
+# Keep local credentials and private keys out of version control.
+.env
+.env.*
+!.env.example
+*.pem
+*.key

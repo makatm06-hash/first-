@@ -22,6 +22,7 @@ export function initEnquiryForm(form) {
   try {
    const response = await fetch(form.action, {
     method: 'POST', body: data,
+    credentials: 'omit', redirect: 'error',
     headers: { Accept: 'application/json' },
     signal: controller.signal,
    });

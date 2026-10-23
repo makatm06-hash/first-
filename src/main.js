@@ -62,7 +62,7 @@ function renderMedia(i, container, controls = false) {
   const player = document.createElement('iframe');
   player.src = `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&playsinline=1`;
   player.title = `${project.name} campaign film`;
-  player.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+  player.allow = 'encrypted-media; picture-in-picture; fullscreen';
   player.allowFullscreen = true;
   player.referrerPolicy = 'strict-origin-when-cross-origin';
   container.append(player);
