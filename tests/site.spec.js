@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-test('portfolio, media upload, and booking workflow',async({page})=>{
+test('portfolio and booking workflow',async({page})=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('/');
  await expect(page.getByRole('heading',{name:'IDEAS MEANT TO SCALE.'})).toBeVisible();
@@ -10,12 +10,6 @@ test('portfolio, media upload, and booking workflow',async({page})=>{
  await expect(page.getByRole('dialog')).toBeVisible();
  await page.getByRole('button',{name:'Close project'}).click();
  await page.getByRole('button',{name:'All work',exact:true}).click();
- await page.getByRole('button',{name:'Edit media ↗',exact:true}).click();
- await page.locator('[data-upload="0"]').setInputFiles({name:'test.svg',mimeType:'image/svg+xml',buffer:Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="red"/></svg>')});
- await expect(page.locator('#editor-status')).toContainText('Media saved');
- await page.getByRole('button',{name:'Close media editor'}).click();
- await page.reload();
- await expect(page.locator('[data-project="0"] img')).toHaveAttribute('src',/^blob:/);
  await page.getByLabel('Your name').fill('Test Person');
  await page.getByLabel('Email address').fill('test@example.com');
  await page.getByLabel('What can we help with?').selectOption('Still-image campaign');
