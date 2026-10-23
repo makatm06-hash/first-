@@ -253,13 +253,14 @@ test('cover loop animates, pauses, and respects reduced motion',async({page})=>{
  const initial=await first.getAttribute('data-distance');
  await page.clock.runFor(14000);
  expect(await first.getAttribute('data-distance')).not.toBe(initial);
- await page.getByRole('button',{name:'Pause featured campaign loop'}).click();
+ await page.locator('.hero-media').focus();
+ await page.keyboard.press('Space');
  await page.clock.runFor(1500);
  const paused=await first.getAttribute('style');
  await page.clock.runFor(3000);
  await expect(first).toHaveAttribute('style',paused);
  await page.emulateMedia({reducedMotion:'reduce'});
- await expect(page.locator('#showcase-play')).toBeHidden();
+ await expect(page.locator('#showcase-play')).toHaveCount(0);
  const reduced=await first.getAttribute('style');
  await page.clock.runFor(12000);
  await expect(first).toHaveAttribute('style',reduced);

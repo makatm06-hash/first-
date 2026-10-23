@@ -5,7 +5,6 @@ export function initCoverCarousel() {
  const stage = document.querySelector('.hero-media');
  const slides = [...stage.querySelectorAll('.featured-slide')];
  const counter = stage.querySelector('#showcase-position');
- const play = stage.querySelector('#showcase-play');
  const preference = matchMedia('(prefers-reduced-motion: reduce)');
  let position = 0, target = 0, frame = 0, lastTime = 0, resumeAt = 0;
  let paused = false, visible = false, active = -1, gesture;
@@ -53,15 +52,11 @@ export function initCoverCarousel() {
   if (preference.matches) { position = target; render(); }
   else schedule();
  }
- function updatePlay() {
-  play.hidden = preference.matches;
+ function syncPlayback() {
   counter.setAttribute('aria-live', paused || preference.matches ? 'polite' : 'off');
-  play.textContent = paused ? 'Play' : 'Pause';
-  play.setAttribute('aria-label', paused ? 'Play featured campaign loop' : 'Pause featured campaign loop');
  }
  stage.querySelector('#showcase-prev').onclick = () => move(-1, true);
  stage.querySelector('#showcase-next').onclick = () => move(1, true);
- play.onclick = () => { paused = !paused; updatePlay(); schedule(); };
  stage.addEventListener('wheel', event => {
   if (event.ctrlKey) return;
   // A normal wheel / two-finger vertical gesture always scrolls down the page.
@@ -73,7 +68,11 @@ export function initCoverCarousel() {
   move(Math.max(-1, Math.min(1, pixels / 520)));
  }, { passive: false });
  stage.addEventListener('keydown', event => {
-  if (event.target !== stage || !['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+  if (event.target !== stage) return;
+  if (event.key === ' ') {
+   event.preventDefault(); paused = !paused; syncPlayback(); schedule(); return;
+  }
+  if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
   event.preventDefault(); move(event.key === 'ArrowLeft' ? -1 : 1, true);
  });
  stage.addEventListener('pointerdown', event => {
@@ -105,7 +104,7 @@ export function initCoverCarousel() {
  stage.addEventListener('lostpointercapture', release);
  preference.addEventListener('change', () => {
   cancelAnimationFrame(frame); frame = 0; lastTime = 0;
-  position = target = Math.round(position); updatePlay(); render(); schedule();
+  position = target = Math.round(position); syncPlayback(); render(); schedule();
  });
  document.addEventListener('visibilitychange', () => {
   cancelAnimationFrame(frame); frame = 0; lastTime = 0; schedule();
@@ -121,5 +120,5 @@ export function initCoverCarousel() {
  } else { visible = true; schedule(); }
  new ResizeObserver(render).observe(stage);
  resumeAt = performance.now() + 1800;
- updatePlay(); render();
+ syncPlayback(); render();
 }

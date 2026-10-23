@@ -72,7 +72,7 @@ The existing cover images remain in the portfolio and showcase. YouTube players 
 
 ## Cover carousel
 
-`src/cover-carousel.js` arranges the featured covers around a larger central image with a slow continuous loop, pause and arrow controls, horizontal trackpad scrolling, and mouse/touch dragging. Vertical wheel and touch gestures keep their native page scrolling; the carousel has no pinned scroll sequence. It stops animating offscreen and respects reduced-motion preferences.
+`src/cover-carousel.js` arranges the featured covers around a larger central image with a slow continuous loop, arrow controls, horizontal trackpad scrolling, and mouse/touch dragging. When the carousel is keyboard-focused, Space pauses or resumes the loop. Vertical wheel and touch gestures keep their native page scrolling; the carousel has no pinned scroll sequence. It stops animating offscreen and respects reduced-motion preferences.
 
 
 ## Email enquiries
