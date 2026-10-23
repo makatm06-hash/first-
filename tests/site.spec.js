@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 test('portfolio, media upload, and booking workflow',async({page})=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('/');
- await expect(page.getByRole('heading',{name:'BIG IDEAS. BUILT TO SCALE.'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'IDEAS MEANT TO SCALE.'})).toBeVisible();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
  await page.getByRole('button',{name:'Video campaigns',exact:true}).click();
  await expect(page.locator('.project:visible')).toHaveCount(3);
