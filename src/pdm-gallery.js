@@ -2,6 +2,8 @@ const stills = [
  { source: '/campaigns/product-photography/still-1.png', description: 'A close-up of a dark Parfums de Marly bottle in warm sunlight.' },
  { source: '/campaigns/product-photography/still-2.png', description: 'Parfums de Marly fragrance bottles among chess pieces and vanilla pods.' },
  { source: '/campaigns/product-photography/still-3.png', description: 'A pale Parfums de Marly bottle with chess pieces in golden light.' },
+ { source: '/campaigns/product-photography/rhode.png', crop: 'left', description: 'Rhode peptide lip treatment campaign: a model in sunglasses with a yellow lip treatment tube.' },
+ { source: '/campaigns/product-photography/rhode.png', crop: 'right', description: 'A yellow Rhode peptide lip treatment tube tucked into a black leather pocket.' },
 ];
 const modulo = (value, length) => ((value % length) + length) % length;
 
@@ -17,16 +19,16 @@ export function initPdmGallery() {
     <h2 id="pdm-title">Product photography</h2>
     <button class="pdm-close" type="button" aria-label="Close project">Back to work <span aria-hidden="true">×</span></button>
    </header>
-   <div class="pdm-stage" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Parfums de Marly still-image gallery" aria-describedby="pdm-instructions">
+   <div class="pdm-stage" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Product photography image gallery" aria-describedby="pdm-instructions">
     <div class="pdm-cards" aria-hidden="true"></div>
     <p class="pdm-loading" role="status" hidden>Loading images…</p>
    </div>
    <footer class="pdm-footer">
-    <div><p>PARFUMS DE MARLY</p><span>Still-image campaign</span></div>
+    <div><p>PRODUCT PHOTOGRAPHY</p></div>
     <p id="pdm-instructions">Scroll or drag to explore</p>
     <div class="pdm-controls">
      <button class="pdm-play" type="button" aria-label="Pause image loop">Pause <span aria-hidden="true">Ⅱ</span></button>
-     <span class="pdm-counter" aria-live="off">01 / 03</span>
+     <span class="pdm-counter" aria-live="off">01 / ${String(stills.length).padStart(2, '0')}</span>
      <button class="pdm-prev" type="button" aria-label="Previous product photo">←</button>
      <button class="pdm-next" type="button" aria-label="Next product photo">→</button>
     </div>
@@ -40,10 +42,12 @@ export function initPdmGallery() {
  const description = dialog.querySelector('.pdm-description');
  const play = dialog.querySelector('.pdm-play');
  const preference = matchMedia('(prefers-reduced-motion: reduce)');
- // Nine slots repeat the three originals. Recycling happens outside the visible fan.
- const cards = Array.from({ length: 9 }, (_, index) => {
+ // Repeat complete sets so recycling stays outside the visible fan.
+ const slotCount = Math.ceil(9 / stills.length) * stills.length;
+ const cards = Array.from({ length: slotCount }, (_, index) => {
   const card = document.createElement('div');
-  card.className = 'pdm-card';
+  const still = stills[index % stills.length];
+  card.className = `pdm-card${still.crop ? ` pdm-card--diptych pdm-card--${still.crop}` : ''}`;
   card.dataset.still = String(index % stills.length + 1);
   const image = document.createElement('img');
   image.dataset.source = stills[index % stills.length].source;
@@ -60,7 +64,7 @@ export function initPdmGallery() {
  function render(announce = false) {
   const width = cards[0].offsetWidth;
   cards.forEach((card, index) => {
-   const distance = modulo(index - position + 4.5, 9) - 4.5;
+   const distance = modulo(index - position + slotCount / 2, slotCount) - slotCount / 2;
    const depth = Math.abs(distance);
    const scale = Math.pow(.72, depth);
    const x = Math.sign(distance) * width * .82 * (1 - scale) / .28;
@@ -72,9 +76,9 @@ export function initPdmGallery() {
   const index = modulo(Math.round(position), stills.length);
   if (index !== activeIndex) {
    activeIndex = index;
-   counter.textContent = `${String(index + 1).padStart(2, '0')} / 03`;
+   counter.textContent = `${String(index + 1).padStart(2, '0')} / ${String(stills.length).padStart(2, '0')}`;
   }
-  if (announce) description.textContent = `Image ${index + 1} of 3. ${stills[index].description}`;
+  if (announce) description.textContent = `Image ${index + 1} of ${stills.length}. ${stills[index].description}`;
  }
  function tick(time) {
   frame = 0;
@@ -83,9 +87,9 @@ export function initPdmGallery() {
   previousTime = time;
   if (automatic() && time > resumeAt) target += elapsed / 10000;
   position = preference.matches ? target : position + (target - position) * (1 - Math.exp(-elapsed / 115));
-  // Keep values small without changing the repeated three-image sequence.
-  const turns = Math.floor(position / 9);
-  if (turns) { position -= turns * 9; target -= turns * 9; }
+  // Keep values small without changing the repeated image sequence.
+  const turns = Math.floor(position / slotCount);
+  if (turns) { position -= turns * slotCount; target -= turns * slotCount; }
   render();
   if (announceNext && Math.abs(target - position) < .01) { render(true); announceNext = false; }
   if (automatic() || Math.abs(target - position) > .0001) schedule();

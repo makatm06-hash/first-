@@ -162,3 +162,8 @@ input,textarea,select{transition:border-color .25s ease}
 .pdm-cards{transition:opacity .6s ease}
 .pdm-loading{position:absolute;inset:0;display:grid;place-items:center;font-size:11px;letter-spacing:.06em;color:var(--muted);padding:24px;text-align:center}
 .pdm-loading[hidden]{display:none}
+
+.pdm-card{border-radius:8px;overflow:hidden}
+/* Display the two supplied Rhode photographs individually, preserving the source. */
+.pdm-card--diptych img{width:200%;max-width:none;object-fit:fill}
+.pdm-card--right img{transform:translateX(-50%)}

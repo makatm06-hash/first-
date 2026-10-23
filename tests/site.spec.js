@@ -92,7 +92,7 @@ test('product collage stays static and portfolio covers align', async ({page, is
  await card.click();
  await expect(page.getByRole('dialog').getByRole('heading',{name:'Product photography',exact:true})).toBeVisible();
  await expect(page.locator('#pdm-dialog')).toBeVisible();
- await expect(page.locator('#pdm-dialog .pdm-card img')).toHaveCount(9);
+ await expect(page.locator('#pdm-dialog .pdm-card img')).toHaveCount(10);
  await expect(page.getByRole('button',{name:'Next product photo'})).toBeVisible();
  await page.getByRole('button',{name:'Close project'}).click();
  await page.locator('.work').screenshot({path:`/tmp/mastudio-even-covers-${isMobile?'mobile':'desktop'}.png`});
@@ -120,7 +120,7 @@ test('each campaign opens its matching YouTube player and removes it on close', 
  }
  await page.getByRole('button',{name:'View Product photography',exact:true}).click();
  await expect(page.locator('#pdm-dialog')).toBeVisible();
- await expect(page.locator('#pdm-dialog .pdm-card img')).toHaveCount(9);
+ await expect(page.locator('#pdm-dialog .pdm-card img')).toHaveCount(10);
  await expect(page.locator('iframe')).toHaveCount(0);
 });
 
@@ -136,18 +136,24 @@ test('PDM opens a full-screen depth gallery with looping controls and drag', asy
  const bounds=await dialog.boundingBox();
  expect(bounds.width).toBe(page.viewportSize().width);
  expect(bounds.height).toBe(page.viewportSize().height);
- await expect.poll(()=>dialog.locator('img').evaluateAll(imgs=>imgs.every(img=>img.complete&&img.naturalWidth===1792))).toBe(true);
+ await expect.poll(()=>dialog.locator('img').evaluateAll(imgs=>imgs.every(img=>img.complete&&[1792,3584].includes(img.naturalWidth)))).toBe(true);
+ await expect(dialog.locator('.pdm-footer')).toContainText('PRODUCT PHOTOGRAPHY');
+ await expect(dialog.locator('.pdm-footer')).not.toContainText('PARFUMS DE MARLY');
+ const rhodeFrames=dialog.locator('.pdm-card--diptych');
+ await expect(rhodeFrames).toHaveCount(4);
+ expect(await rhodeFrames.first().evaluate(el=>getComputedStyle(el).borderRadius)).toBe('8px');
+ expect(await rhodeFrames.first().locator('img').evaluate(el=>el.getBoundingClientRect().width/el.parentElement.getBoundingClientRect().width)).toBeCloseTo(2,1);
  const depths=await dialog.locator('.pdm-card').evaluateAll(cards=>cards.map(card=>({distance:Number(card.dataset.distance),width:card.getBoundingClientRect().width})));
  expect(depths.find(card=>card.distance===0).width).toBeGreaterThan(depths.find(card=>card.distance===1).width);
- await expect(dialog.locator('.pdm-counter')).toHaveText('01 / 03');
- for(const count of ['02 / 03','03 / 03','01 / 03']){
+ await expect(dialog.locator('.pdm-counter')).toHaveText('01 / 05');
+ for(const count of ['02 / 05','03 / 05','04 / 05','05 / 05','01 / 05']){
   await page.getByRole('button',{name:'Next product photo'}).click();
   await expect(dialog.locator('.pdm-counter')).toHaveText(count);
  }
  await page.getByRole('button',{name:'Previous product photo'}).click();
- await expect(dialog.locator('.pdm-counter')).toHaveText('03 / 03');
+ await expect(dialog.locator('.pdm-counter')).toHaveText('05 / 05');
  await stage.focus();await page.keyboard.press('ArrowRight');
- await expect(dialog.locator('.pdm-counter')).toHaveText('01 / 03');
+ await expect(dialog.locator('.pdm-counter')).toHaveText('01 / 05');
  const box=await stage.boundingBox();
  if(isMobile){
   const session=await page.context().newCDPSession(page);
@@ -159,14 +165,14 @@ test('PDM opens a full-screen depth gallery with looping controls and drag', asy
   await page.mouse.move(box.width*.7,box.y+box.height/2);await page.mouse.down();
   await page.mouse.move(box.width*.7-250,box.y+box.height/2,{steps:8});await page.mouse.up();
  }
- await expect(dialog.locator('.pdm-counter')).toHaveText('02 / 03');
+ await expect(dialog.locator('.pdm-counter')).toHaveText('02 / 05');
  await expect(page.getByRole('button',{name:'Pause image loop'})).toBeHidden();
  await page.screenshot({path:`/tmp/pdm-depth-${isMobile?'mobile':'desktop'}.png`});
  await page.keyboard.press('Escape');
  await expect(dialog).toBeHidden();
  await expect(card).toBeFocused();
  await expect.poll(()=>page.evaluate(()=>document.body.style.overflow)).toBe('');
- await card.click();await expect(dialog.locator('.pdm-counter')).toHaveText('01 / 03');
+ await card.click();await expect(dialog.locator('.pdm-counter')).toHaveText('01 / 05');
  await page.getByRole('button',{name:'Close project'}).click();
  await page.getByRole('button',{name:'View Saucony',exact:true}).click();
  await expect(page.locator('#project-dialog iframe')).toHaveCount(1);
@@ -181,7 +187,7 @@ test('PDM loop moves smoothly, pauses, and stops for reduced motion',async({page
  const initial=await card.getAttribute('data-distance');
  await page.clock.runFor(15000);
  expect(await card.getAttribute('data-distance')).not.toBe(initial);
- await expect(page.locator('.pdm-counter')).toHaveText('02 / 03');
+ await expect(page.locator('.pdm-counter')).toHaveText('02 / 05');
  await page.getByRole('button',{name:'Pause image loop'}).click();
  await page.clock.runFor(1500);
  const paused=await card.getAttribute('style');
